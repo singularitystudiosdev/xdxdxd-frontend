@@ -1,0 +1,572 @@
+/* The resident-agent lander: the stage (a desktop frame with the mascot at the
+   keyboard), incident cards that pop up around it, the beam of traffic while it
+   works, the autonomy dial and the superbot.log block. Tokens come from
+   site.css; numbers and their sources are in harness-notes/brand-refresh.md
+   (Sentry's incident cards, Cluely's enter → work → swipe-out cycle, sonner's
+   stack math, Material 3 durations). Only transform, opacity and the SVG dash
+   offset animate. */
+
+:root { --warn: #d9b86b; --stage: #0d0d0d; --window: #181818; }
+
+/* ---- hero grid: one column by default; the split variant is a two-column
+   grid on wide screens (copy + install left, stage right, log across) ---- */
+.hero {
+  max-width: var(--container); margin: 0 auto;
+  padding: var(--sp-10) var(--gutter-r) 0 var(--gutter-l);
+  display: grid; gap: var(--sp-6); justify-items: center; text-align: center;
+  position: relative; z-index: 1;
+}
+/* grid items shrink below their content (the one-liner's nowrap command would
+   otherwise set the column's minimum and push a phone page to 620px) */
+.hero > * { min-width: 0; max-width: 100%; }
+/* the width caps come from the token sheet, not one-off px: the copy column
+   and the stage/desk share --content, the prose caps share --measure (62ch),
+   so the page reads on one width rhythm */
+.hero-copy { max-width: var(--content); }
+/* the perch anchor beside the headline: an empty box the hero's `perch` cuts
+   (hub-boot.js CUTS) move the mascot into once the terminal column collapses.
+   Empty and inert for every other cut, and gone below the tablet cut where the
+   headline needs its full width. */
+/* the brand lockup: the kit's tile beside the three-line headline, gap tight
+   enough that the two read as one unit (owner, 2026-09-08). The tile is the
+   static ring tile (a static surface, so the ring is right here); it scales
+   with the headline through the h1's font size. Below the tablet cut the tile
+   sits above the words. */
+.sb-lockup { display: flex; align-items: center; justify-content: center; gap: var(--sp-5); }
+/* the mark alone, bigger than the tile was, with the kit's duotone offset as
+   a slow idle: the teal ghost up-left and the magenta ghost down-right breathe
+   between the glitch ladder's whisper (0.5 units of the 100-unit face) and
+   base (1.2) offsets on two periods that never line up, with one brief slip
+   past base each cycle; the white face never moves (duostorm.css
+   --duo-offset*). SVG user units, so it scales with the mark. Reduced motion
+   rests both ghosts at the base offset: the glitch shows, nothing moves. */
+/* the ratio: 5.4 headline-ems, measured 2026-09-09 to match the OG card
+   (site/assets/og.png), where the mark is about as WIDE as the wordmark block
+   and ~3x its height. In the OG the mark dominates the text; at 3.4em it was
+   only as tall as the three-line headline, so the lockup read wordmark-first.
+   5.4em puts the mark's rendered width at the widest headline line
+   ('your agents.', 348.7px measured vs 351.1px rendered at 1280, +0.7%); the
+   lockup stays inside var(--container) and stays centred. */
+.sb-glitch { flex: none; width: 5.4em; height: 5.4em; font-size: var(--fs-h1); display: block; overflow: visible; }
+.sb-glitch-a { transform: translate(-1.2px, -1.2px); animation: sb-glitch-a 7s ease-in-out infinite; } /* deliberate */
+.sb-glitch-b { transform: translate(1.2px, 1.2px); animation: sb-glitch-b 11s ease-in-out infinite; } /* deliberate */
+@keyframes sb-glitch-a { 0%, 100% { transform: translate(-1.2px, -1.2px); } 38% { transform: translate(-0.5px, -0.6px); } 41% { transform: translate(-2.2px, -1px); } 44% { transform: translate(-1.2px, -1.2px); } 72% { transform: translate(-0.7px, -0.5px); } }
+@keyframes sb-glitch-b { 0%, 100% { transform: translate(1.2px, 1.2px); } 27% { transform: translate(0.6px, 0.5px); } 61% { transform: translate(1.2px, 1.2px); } 63% { transform: translate(2px, 0.6px); } 66% { transform: translate(1.2px, 1.2px); } 84% { transform: translate(0.5px, 0.8px); } }
+@media (prefers-reduced-motion: reduce) { .sb-glitch-a, .sb-glitch-b { animation: none; } }
+@media (max-width: 820px) { .sb-lockup { flex-direction: column; gap: var(--sp-4); } .sb-glitch { width: 164px; height: 164px; } }
+.hero h1 { font-size: var(--fs-h1); line-height: 1.1; }
+.hero .sub {
+  margin: var(--sp-4) auto 0; max-width: var(--measure); color: var(--muted);
+  font-size: var(--fs-base); line-height: var(--lh-base);
+}
+.hero .sub b { color: var(--fg); font-weight: 500; }
+/* compact: one clause per line, a break wherever the colour changes */
+.hero .sub { max-width: var(--measure); }
+.hero .sub br { display: initial; }
+/* the closing line: a slow accent shimmer across the words, the one place the
+   copy is allowed to glow. Reduced motion holds the accent colour, no sweep. */
+.hero .sub .vibe {
+  color: var(--accent); font-weight: 500;
+  background: linear-gradient(100deg, var(--storm-1) 0 38%, var(--fg) 50%, var(--storm-1) 62% 100%); /* storm-1 → ink → storm-1: the retired cream stop is gone */
+  background-size: 260% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: vibe-sweep 3.2s var(--ease-std) infinite; /* deliberate */
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+@keyframes vibe-sweep { 0% { background-position: 120% 0; } 100% { background-position: -140% 0; } }
+@media (prefers-reduced-motion: reduce) { .hero .sub .vibe { animation: none; background: none; color: var(--accent); } }
+
+/* the benefit pop: on every resolved card a chip floats up and out with the
+   user's own gain on it (+$4.12, +702 tokens, 3x faster). One line, 900ms,
+   gone; the card keeps its footer. */
+.gain {
+  position: absolute; z-index: 6; pointer-events: none;
+  font-size: var(--fs-sm); line-height: var(--lh-sm); font-weight: 600; white-space: nowrap;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--window));
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); border-radius: var(--r-pill);
+  padding: 2px 10px; box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .9);
+  animation: gain-rise 1100ms var(--ease-out) both; /* deliberate */
+}
+@keyframes gain-rise {
+  0% { opacity: 0; transform: translate(-50%, 6px) scale(.9); }
+  18% { opacity: 1; transform: translate(-50%, -6px) scale(1.04); }
+  70% { opacity: 1; transform: translate(-50%, -26px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -40px) scale(1); }
+}
+/* reduced: the sitewide kill-switch (site.css) collapses any animation to a
+   single frame held at its final keyframe — gain-fade's end is opacity 0, so
+   an animated chip would never be seen. No animation at all: a static pill
+   at the fade's held position (centered, 12px up, fully visible) for its
+   1200ms lifetime. */
+@media (prefers-reduced-motion: reduce) { .gain { animation: none; opacity: 1; transform: translate(-50%, -12px); } }
+@media (max-width: 560px) { .hero .sub { font-size: var(--fs-sm); line-height: var(--lh-sm); } }
+.hero #oneliner { width: 100%; }
+
+@media (min-width: 900px) {
+  .hero[data-variant="split"] {
+    grid-template-columns: 46fr 54fr; column-gap: var(--sp-12);
+    grid-template-areas: "copy stage" "dial stage" "install stage" "log log";
+    text-align: left; justify-items: stretch; align-items: center;
+  }
+  .hero[data-variant="split"] .hero-copy { grid-area: copy; align-self: end; max-width: none; }
+  /* the narrower column: two lines of headline, not three */
+  .hero[data-variant="split"] h1 { font-size: clamp(1.75rem, 1rem + 2.4vw, 2.75rem); }
+  .hero[data-variant="split"] .sub { margin-left: 0; }
+  .hero[data-variant="split"] .dial { grid-area: dial; justify-self: start; }
+  .hero[data-variant="split"] #oneliner { grid-area: install; align-self: start; }
+  .hero[data-variant="split"] .sb-oneliner { margin: 0; }
+  /* the desk (stage + its dock rail) owns the grid cell now; the stage itself
+     drops its 720px cap so the pair fills the column like the stage alone did */
+  .hero[data-variant="split"] .desk { grid-area: stage; max-width: none; }
+  .hero[data-variant="split"] .desk .stage { max-width: none; }
+  .hero[data-variant="split"] .log { grid-area: log; max-width: none; }
+}
+
+/* ---- the stage: the app's own canvas colour, a 16:10 window ---- */
+.stage {
+  position: relative; width: 100%; max-width: var(--content); aspect-ratio: 16 / 10;
+  background: var(--stage); border: 1px solid var(--line); border-radius: var(--r-lg);
+  overflow: hidden; text-align: left;
+  box-shadow: 0 32px 80px -40px rgba(0, 0, 0, .9);
+}
+.stage-bar {
+  position: absolute; inset: 0 0 auto 0; height: 28px; z-index: 2;
+  display: flex; align-items: center; gap: 6px; padding: 0 12px;
+  border-bottom: 1px solid var(--line); background: var(--stage);
+  font-size: var(--fs-xs); line-height: var(--lh-xs); color: var(--muted); white-space: nowrap;
+}
+.stage-bar i, .card-bar i {
+  width: 7px; height: 7px; border-radius: 50%; flex: none;
+  border: 1px solid var(--line); background: var(--raised);
+}
+.stage-bar span { margin-left: 6px; overflow: hidden; text-overflow: ellipsis; }
+.led { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
+.led.on { background: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.led.work { background: var(--warn); animation: led-pulse 1.2s ease-in-out infinite; /* deliberate */ }
+@keyframes led-pulse { 50% { opacity: .35; } }
+.stage-bar .led, .card-bar .led { margin-left: auto; }
+
+/* the mascot sits at the bottom, centred on the desk, bottom-left in a stack */
+.stage .mascot {
+  /* 40 cols × 20 rows: 9px glyphs make a ~215px-wide, 180px-tall character
+     in the 720px stage; the side columns (cards) stay clear of its x range */
+  position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); margin: 0;
+  font: clamp(5px, 1.25vw, 9px) / 1 var(--font-mono); color: #ffffff; user-select: none;
+  filter: drop-shadow(0 0 14px rgb(255 255 255 / .10)); cursor: default; /* neutral white whisper glow only — user, 2026-09-08: "Make him just purely white with this reframe"; the storm duotone text-shadow is retired at every beat */
+}
+.stage.stacked .mascot { left: 10px; transform: none; font-size: clamp(4.5px, 1.4vw, 8px); }
+
+/* the keyboard: two staggered rows of keycaps under the character (dkl's
+   textmode keyboard rows, as CSS caps so a struck key can flash in the
+   accent). A hit lands at once and decays over 180ms, Material's small-area
+   exit duration; hero-stage.js centres it under the mascot in either layout. */
+.keys {
+  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 2;
+  display: grid; gap: 3px; pointer-events: none;
+}
+.keys .row { display: flex; gap: 3px; }
+.keys .row + .row { padding-left: 8px; }
+.keys i {
+  display: block; width: 13px; height: 8px; border-radius: 2px;
+  border: 1px solid var(--line); background: var(--raised);
+  transition: background-color 180ms var(--ease-out), border-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+.keys i.hit {
+  background: var(--accent); border-color: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: none;
+}
+.stage.stacked .keys { bottom: 6px; gap: 2px; }
+.stage.stacked .keys .row { gap: 2px; }
+.stage.stacked .keys .row + .row { padding-left: 6px; }
+.stage.stacked .keys i { width: 10px; height: 6px; }
+
+/* the helper: a smaller second character in the left wing, with a badge
+   naming whose agent it is. Walked in and out by hero-stage.js; hidden
+   until its beat. */
+.helper {
+  position: absolute; left: 22px; bottom: 14px; z-index: 3;
+  display: grid; justify-items: center; gap: 4px; pointer-events: none;
+}
+.helper[hidden] { display: none; }
+.helper .mascot-sm {
+  margin: 0; font: clamp(3.4px, .8vw, 5.8px) / 1 var(--font-mono); color: #ffffff; user-select: none;
+  filter: drop-shadow(0 0 12px rgb(255 255 255 / .10)); /* same pure-white rule as the stage mascot: no duotone ghost at any size */
+}
+.helper .helper-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--fs-xs); line-height: var(--lh-xs); padding: 0 7px; border-radius: var(--r-pill);
+  border: 1px solid var(--line); background: var(--card); color: var(--muted); white-space: nowrap;
+}
+.helper .helper-tag svg.app { width: 11px; height: 11px; flex: none; fill: currentColor; color: var(--fg); opacity: .85; }
+.stage.stacked .helper { left: auto; right: 14px; bottom: 12px; }
+/* the help card sits above the helper's head, clear of it, so the beam from
+   superbot's keyboard and the helper both stay visible */
+.stage:not(.stacked) .card[data-kind="help"] { left: 20px; top: 22%; --origin: 0 100%; }
+
+/* the beam: a thin curve from the keyboard's edge to the card it is working
+   on, with dashes travelling along it while it types */
+.beam { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
+.beam path { fill: none; stroke: var(--accent); stroke-linecap: round; }
+.beam .line { stroke-width: 1.2; opacity: 0; }
+.beam .traffic { stroke-width: 2.2; stroke-dasharray: 3 14; opacity: 0; transition: opacity var(--dur-3) var(--ease-std); }
+.beam.on .traffic { opacity: .9; animation: beam-flow .7s linear infinite; /* deliberate */ }
+@keyframes beam-flow { to { stroke-dashoffset: -17; } }
+
+/* ---- incident cards: replicas of the app's own window chrome ---- */
+.card {
+  /* 280px in a 720px stage leaves the middle 160px to the mascot */
+  position: absolute; width: min(280px, 42%); z-index: 4;
+  --depth: 0;
+}
+.card-in {
+  background: var(--window); border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+  box-shadow: 0 16px 40px -20px rgba(0, 0, 0, .95);
+  font-size: var(--fs-xs); line-height: var(--lh-xs); color: var(--fg);
+  transform-origin: var(--origin, 50% 50%);
+}
+.card-bar {
+  display: flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px;
+  border-bottom: 1px solid var(--line); color: var(--muted); font-size: var(--fs-xs); line-height: var(--lh-xs); white-space: nowrap;
+}
+.card-bar span { margin-left: 5px; overflow: hidden; text-overflow: ellipsis; }
+/* the client's mark(s) before its name — the dock's own symbols, at bar scale */
+.card-bar svg.app { width: 12px; height: 12px; flex: none; fill: currentColor; color: var(--fg); opacity: .85; }
+.card-bar i + svg.app { margin-left: 5px; }
+.card-bar svg.app + span { margin-left: 2px; }
+.card-body { padding: 10px 12px 8px; display: grid; gap: 5px; }
+.card .problem, .card .ask, .card .fix {
+  display: grid; grid-template-columns: 12px 1fr; gap: 6px; align-items: start; overflow-wrap: anywhere;
+}
+.card .problem { color: var(--danger); transition: color var(--dur-4) var(--ease-std); }
+.card .problem::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; margin: 5px 3px 0; }
+.card .problem.dim { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 55%, transparent); }
+.card .ask { color: var(--warn); }
+.card .ask::before { content: '?'; font-weight: 700; text-align: center; }
+.card .fix { color: var(--accent); }
+.card .fix::before { content: '✓'; font-weight: 700; text-align: center; opacity: 0; }
+.card .fix.done::before { opacity: 1; animation: check-pop 180ms cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes check-pop { from { transform: scale(.4); } to { transform: none; } }
+.card .fix .t::after { content: '▌'; color: var(--accent); margin-left: 1px; animation: blink 1.06s steps(1) infinite; /* deliberate */ }
+.card .fix.done .t::after { content: none; }
+@keyframes blink { 50% { opacity: 0; } }
+.card-foot { padding: 0 12px 8px; color: var(--muted); font-size: var(--fs-xs); line-height: var(--lh-xs); }
+.card [hidden] { display: none; }
+
+/* desk layout: four anchor slots around the mascot; cards grow out of the
+   slot's own corner, never over the mascot */
+.stage:not(.stacked) .card[data-slot="tl"] { left: 20px; top: 40px; --origin: 0 0; }
+.stage:not(.stacked) .card[data-slot="tr"] { right: 20px; top: 40px; --origin: 100% 0; }
+.stage:not(.stacked) .card[data-slot="ml"] { left: 20px; top: 44%; --origin: 0 50%; }
+.stage:not(.stacked) .card[data-slot="mr"] { right: 20px; top: 44%; --origin: 100% 50%; }
+
+/* stack layout (the split variant, and any stage under 560px): one column,
+   newest on top, each older card lifted 14px and 5% smaller (sonner) */
+.stage.stacked .card {
+  right: 12px; top: 36px; width: min(300px, 56%);
+  transform: translateY(calc(var(--depth) * -14px)) scale(calc(1 - var(--depth) * .05));
+  opacity: calc(1 - var(--depth) * .28);
+  z-index: calc(10 - var(--depth));
+  /* one move, not two: the stack re-shuffles depth, position and fade together */
+  transition: transform 400ms var(--ease-out), opacity 400ms var(--ease-out); /* deliberate */
+}
+.stage.stacked .card[data-depth="1"] { --depth: 1; }
+.stage.stacked .card[data-depth="2"] { --depth: 2; }
+/* the cards behind take the front card's height (sonner's --front-toast-height),
+   so a taller older card never peeks out under a shorter new one — set inline
+   by hero-stage.js. Height itself never animates: only transform and opacity
+   move (the motion floor), so the height lands in one step. */
+.stage.stacked .card-in { --origin: 50% 0; overflow: hidden; }
+@media (max-width: 560px) {
+  /* no JS to add .stacked on a phone: the static cards still stack. The
+     [data-slot] selector matches the desk rules' specificity so these win. */
+  .stage:not(.stacked) .card[data-slot] { right: 12px; left: auto; top: 36px; width: min(300px, 56%); }
+  .stage:not(.stacked) .card[data-depth="1"] { transform: translateY(-14px) scale(.95); opacity: .72; z-index: 9; }
+  .stage:not(.stacked) .card[data-depth="2"] { transform: translateY(-28px) scale(.9); opacity: .44; z-index: 8; }
+  .stage:not(.stacked) .mascot { left: 10px; transform: none; font-size: clamp(4.5px, 1.4vw, 8px); }
+  .stage:not(.stacked) .keys { left: 76px; bottom: 6px; }
+  .stage:not(.stacked) .keys i { width: 10px; height: 6px; }
+}
+
+/* ---- the autonomy dial: a real segmented control (radiogroup) that sets
+   which cards ask before they fix. 36px targets, arrow keys move the choice. ---- */
+.dial { display: inline-flex; align-items: center; gap: var(--sp-3); font-size: var(--fs-sm); color: var(--muted); flex-wrap: wrap; justify-content: center; }
+.dial .seg { display: inline-flex; gap: 2px; border: 1px solid var(--line); border-radius: var(--r-pill); padding: 3px; background: var(--card); }
+.dial .seg button {
+  display: inline-flex; align-items: center; min-height: 30px; padding: 0 14px;
+  border: 1px solid transparent; border-radius: var(--r-pill); white-space: nowrap;
+  background: none; color: var(--muted); cursor: pointer;
+  transition: color var(--dur-2) var(--ease-std), background-color var(--dur-2) var(--ease-std), border-color var(--dur-2) var(--ease-std);
+}
+.dial .seg button:hover { color: var(--fg); background: var(--raised); }
+.dial .seg button[aria-checked="true"] { color: var(--accent); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.dial .hint { font-size: var(--fs-xs); line-height: var(--lh-xs); min-height: var(--lh-xs); flex-basis: 100%; text-align: center; transition: opacity var(--dur-3) var(--ease-std); }
+@media (min-width: 900px) { .hero[data-variant="split"] .dial .hint { text-align: left; } }
+/* a finger gets the 44px segment (the segmented control's own scale is 30px
+   for a mouse); the hint is a sentence, so on a phone it takes body-small */
+@media (pointer: coarse) {
+  .dial .seg button { min-height: 44px; padding: 0 var(--sp-4); }
+  .dial .hint { font-size: var(--fs-sm); line-height: var(--lh-sm); }
+}
+
+/* ---- superbot.log: the six pillars as evidence, not a feature list ---- */
+.log {
+  width: 100%; max-width: var(--content); text-align: left;
+  background: var(--stage); border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: var(--sp-3) var(--sp-4); font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--muted);
+}
+.log .lab { font-size: var(--fs-xs); line-height: var(--lh-xs); letter-spacing: .08em; text-transform: uppercase; margin-bottom: var(--sp-2); }
+.log ol { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--sp-1); }
+/* one line per event, never wrapped: a terminal clips at the edge. The tag
+   column is wide enough for "superbot", the longest tag, so the text column
+   starts on the same x for every row. */
+.log li { display: grid; grid-template-columns: 8ch 9ch minmax(0, 1fr); gap: var(--sp-3); min-height: var(--lh-sm); white-space: nowrap; }
+.log li .t { overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; }
+/* the timestamp sits at full contrast (the old opacity .75 dim read ≈4.4:1
+   over the muted line, under AA); the flash cools back to rest over 600ms,
+   the way a terminal line dims */
+.log time { transition: color 600ms var(--ease-std); /* deliberate */ }
+.log b { color: var(--accent); font-weight: 500; }
+.log li.flash time { color: var(--warn); opacity: 1; transition: none; }
+/* a freshly appended line rises in; the oldest simply leaves */
+.log li { transition: opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out); }
+.log li.new { opacity: 0; transform: translateY(6px); transition: none; }
+.log .money { color: var(--accent); }
+@media (max-width: 560px) { .log li { grid-template-columns: 9ch minmax(0, 1fr); } .log time { display: none; } }
+
+/* ---- works anywhere: one sentence after the install box (the no-JS page,
+   where the hero grid's own gap spaces it); with JS the module script moves
+   it under the install box's fold, where the .sb-oneliner rule below
+   re-tunes it ---- */
+.anywhere { margin-top: 0; max-width: var(--content); color: var(--muted); font-size: var(--fs-sm); line-height: var(--lh-sm); text-align: center; }
+.anywhere b { color: var(--fg); font-weight: 500; display: block; font-size: var(--fs-base); line-height: var(--lh-base); margin-bottom: 2px; }
+@media (min-width: 900px) { .hero[data-variant="split"] .anywhere { grid-column: 1 / -1; text-align: left; max-width: none; } }
+
+/* ---- reduced motion: the stage is a still, the log is a list ---- */
+@media (prefers-reduced-motion: reduce) {
+  .led.work, .beam .traffic, .card .fix .t::after, .card .fix.done::before { animation: none; }
+  .stage.stacked .card, .card .problem, .log time { transition: none; }
+}
+
+/* ---- hero dock: the client rail as the stage's bottom edge ---- */
+.desk { width: 100%; max-width: var(--content); }
+/* the boot-sequence hero (hub-boot.css, promoted to / 2026-09-06) carries a
+   four-column hub whose fixed tracks need ~900px; the 720px --content cap
+   squeezed its chat lane to 120px. 4/3 of --content (960px) fits the hub and
+   keeps the stage in proportion with the headline (owner, 2026-09-06: the
+   full-width stage dwarfed the copy); the copy block widens to the same cap. */
+.desk:has(.arena) { max-width: calc(var(--content) * 4 / 3); }
+.hero:has(.arena) .hero-copy { max-width: calc(var(--content) * 4 / 3); }
+/* the headline is three lines on purpose: "the agent / to manage / your
+   agents." stacks agent, manage, agents in a column (owner, 2026-09-06). The
+   breaks are explicit <br>s in the markup, so the stack does not depend on
+   a width; balance is off so the browser never re-flows around them. */
+.hero:has(.arena) h1 { text-wrap: initial; }
+.hero:has(.arena) h1 br { display: initial; }
+.desk .stage { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.dock {
+  display: flex; align-items: center; flex-wrap: nowrap; gap: var(--sp-2);
+  height: max(48px, calc(var(--target-sm) + 8px)); width: 100%; /* 48px on desktop (owner, 2026-09-06: the 40px row read too small), 52px on a touch pointer */
+  padding: 0 var(--sp-3); text-align: left;
+  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+  background: var(--stage);
+  border: 1px solid var(--line); border-top: 0;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+.dock::-webkit-scrollbar { display: none; }
+.dock .lab {
+  flex: none; margin-right: var(--sp-2); color: var(--muted);
+  font-size: var(--fs-xs); line-height: var(--lh-xs); letter-spacing: .08em; text-transform: uppercase;
+}
+.dock ul.wall-list, .dock .wall-list li { display: contents; }
+.dock a {
+  display: grid; grid-template-columns: 20px 0fr; column-gap: 0; align-items: center;
+  flex: none; /* an overflowing row squeezes flex items back to min-content —
+    the open name track (min-width: 0) would collapse to 0 and the pill would
+    never extend; the row scrolls instead */
+  min-height: max(32px, var(--target-sm));
+  padding: 0 var(--sp-1); border-radius: var(--r-sm);
+  color: var(--muted); font-size: var(--fs-xs); line-height: var(--lh-xs);
+  text-decoration: none; white-space: nowrap;
+  transition: grid-template-columns var(--dur-4) var(--ease-out),
+    column-gap var(--dur-4) var(--ease-out), color var(--dur-2) var(--ease-std);
+}
+.dock a svg { width: 20px; height: 20px; opacity: .8;
+  transition: opacity var(--dur-2) var(--ease-std), filter var(--dur-2) var(--ease-std); }
+.dock a span {
+  min-width: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+  transition: opacity var(--dur-2) var(--ease-std) var(--dur-2); /* fades in after the track opens */ }
+/* static / no-JS: one row, every name visible */
+.dock:not(.live) a { grid-template-columns: 20px 1fr; column-gap: 6px; }
+.dock:not(.live) a span { opacity: 1; transition-delay: 0s; }
+.dock a:hover, .dock a:focus-visible { color: var(--fg); }
+.dock a:hover svg, .dock a:focus-visible svg { opacity: 1; }
+/* live: the ladder */
+.dock.live a.on { grid-template-columns: 20px 1fr; column-gap: 6px; color: var(--fg); }
+.dock.live a.on svg, .dock.live a.on span { opacity: 1; }
+.dock.live a.done svg { opacity: 1; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 55%, transparent)); }
+/* live: hover/focus previews a name (ghost links stay keyboard-reachable) */
+.dock.live a:hover, .dock.live a:focus-visible { grid-template-columns: 20px 1fr; column-gap: 6px; }
+.dock.live a:hover span, .dock.live a:focus-visible span { opacity: 1; transition-delay: 0s; }
+/* ---- phone (≤560px): lab hidden; fades/scroll/height inherited from the base rule
+   (at 720px the 18 marks+names never fit either, so the mask is base, not a phone
+   override — changed: why the input made fades phone-only) ---- */
+@media (max-width: 560px) {
+  /* the nine client pills cannot fit one row at phone widths, and the base
+     row's answer — a masked scroller with a hidden scrollbar — is itself a
+     hidden overflow path (Q-01): the wall wraps instead, so every pill's box
+     stays inside the viewport and the row never sets a wider minimum */
+  .dock { padding: 0 var(--sp-2); flex-wrap: wrap; height: auto;
+    min-height: max(48px, calc(var(--target-sm) + 8px));
+    overflow-x: visible; row-gap: var(--sp-1);
+    mask-image: none; -webkit-mask-image: none; }
+  .dock .lab { display: none; }
+}
+/* ---- touch: a finger needs 44 wide as well as tall. The icon-only pill is
+   20px of mark plus 4px padding a side (28 wide, measured 2026-09-09 by
+   edge/test/mobile-matrix.test.ts on every one of the 19 client links);
+   the padding grows to --sp-3 a side so the box reaches --target, and the
+   grid centres the mark in it. Hover previews a name on the live rail; a
+   finger never hovers, so under hover:none every name shows outright
+   (the wall already wraps at phone widths, so the row has the room). ---- */
+@media (pointer: coarse) {
+  .dock a { min-width: var(--target); padding: 0 var(--sp-3); justify-content: center; }
+}
+@media (hover: none) {
+  .dock.live a { grid-template-columns: 20px 1fr; column-gap: 6px; }
+  .dock.live a span { opacity: 1; transition-delay: 0s; }
+}
+/* ---- reduced motion: no transition on the rail; .live never added, so names stay visible; the active pill is colour-only ---- */
+@media (prefers-reduced-motion: reduce) {
+  .dock a, .dock a span, .dock a svg { transition: none; }
+  .dock a.on { grid-template-columns: 20px 1fr; column-gap: 6px; color: var(--fg); }
+  .dock a.on span { opacity: 1; }
+  .dock a.done svg { filter: none; }
+}
+
+/* ---- the thought: what the character is thinking while it reads a card,
+   and what it is "dreaming" between fixes (its profile of you, packed a
+   little tighter each time). hero-stage.js fills it and places it just
+   above the head; it is decoration, aria-hidden, and never in the tree the
+   stage's own label already describes. ---- */
+.thought {
+  position: absolute; z-index: 5; right: 16px; bottom: 16px;
+  max-width: 250px; padding: 6px 10px; border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--window) 88%, transparent); border: 1px solid var(--line);
+  font: var(--fs-xs)/var(--lh-xs) var(--font-mono); color: var(--muted); pointer-events: none;
+  opacity: 0; transition: opacity 200ms var(--ease-std, ease);
+}
+.thought.on { opacity: 1; }
+.thought .lab { color: var(--accent); }
+.thought .lab::after { content: ' · '; color: var(--muted); }
+.thought .t { color: var(--fg); }
+/* two small dots toward the character, the way a thought bubble trails to
+   its thinker: leftward on the desk, downward in the stacked layout */
+.thought::after {
+  content: '· ·'; position: absolute; left: -18px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 12px; letter-spacing: 2px; line-height: 1;
+}
+/* stacked: the cards pile on the right and the character sits bottom-left,
+   so the spare corner is top-left */
+.stage.stacked .thought { right: auto; bottom: auto; left: 12px; top: 40px; max-width: calc(44% - 30px); }
+.stage.stacked .thought::after { left: 14px; top: auto; bottom: -15px; transform: none; }
+@media (max-width: 560px) { .thought { padding: 4px 8px; } }
+
+/* ---- the works-anywhere line, tucked under the install box's "what does
+   this do?" fold (owner, 2026-09-01): left-aligned like the fold's own
+   copy, and no section gap once it is inside ---- */
+.sb-oneliner details.sb-fold .anywhere { margin-top: var(--sp-3); max-width: none; text-align: left; }
+.sb-oneliner details.sb-fold .anywhere b { font-size: var(--fs-sm); line-height: var(--lh-sm); }
+
+/* ---- the stage on a phone (reviewer, 2026-09-02: "an empty black box with
+   a smudge"): a taller 4:3 window, the character at 1.6vw glyphs (~150px wide
+   at 393px, was 90), the card column narrowed to 52% so the two stay clear of
+   each other. Last in the sheet on purpose: it has to outrank both the desk
+   and the stacked rules above at equal specificity. ---- */
+@media (max-width: 560px) {
+  .stage { aspect-ratio: 4 / 3; }
+  .stage.stacked .mascot, .stage:not(.stacked) .mascot { font-size: clamp(5px, 1.6vw, 8px); }
+  .stage.stacked .card, .stage:not(.stacked) .card[data-slot] { width: min(300px, 52%); }
+  .stage.stacked .thought { max-width: calc(48% - 24px); }
+}
+
+/* ---- a phone on its side: 343px of height showed the headline and nothing
+   else (reviewer, 2026-09-02). Tighter top padding and a smaller h1 bring the
+   stage's upper half onto the first screen. ---- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero { padding-top: var(--sp-5); gap: var(--sp-4); }
+  .hero h1 { font-size: clamp(1.5rem, 1rem + 2vw, 2rem); }
+  .hero .sub { margin-top: var(--sp-2); }
+}
+
+/* ---- 320px nav (WCAG 1.4.10): the 360px tier in site.css sizes the links at
+   12px with 4px padding, and the row ran five items (benchmarks, docs,
+   chat, log in) when this was measured. At 12px mono (~7.2px/char, ~0.6em) the content column is
+   320 − 2×16 gutters = 288px: word "superbot" 8ch 58 + 16 padding = 74, gap,
+   benchmarks 10ch 72 + 8 = 80, docs 37, chat 37, pill "log in" 6ch 43 + 8 = 51.
+   Untouched (".gg" shown, 8px gap, 16px pill padding) that is 96 + 8 + 205 = 317
+   — it wraps. Dropping ".gg" (−22), trimming the gap (−4) and the pill padding
+   (−8) lands it at 283px, a 5px cushion. Since the docs link left the nav
+   (2026-09-05) the row is four items and 280px WITH ".gg", so the wordmark
+   stays whole here like on every other page; only the trims remain. ---- */
+@media (max-width: 360px) {
+  .sb-header-in { gap: var(--sp-1); }
+  .sb-nav a.pill { padding: 0 var(--sp-1); }
+}
+/* the same row on a 320px touch device: site.css's 360px tier lifts every
+   nav link to min-width var(--target-sm), which is 44px wide under a coarse
+   pointer — 80 + 44 + 44 + 51 + word 66 + gap 4 = 289px, a hair over the 288px
+   column, and no padding trim can close it. Only the min-width gives: the rows
+   stay 44 TALL (min-height follows --target, untouched); only the width gives,
+   and only at this width, where 44×4 plus the wordmark physically cannot fit.
+   The wordmark keeps site.css's padding: a lander-only trim here put its
+   text 4px left of every other page's (2026-09-05), and with the links
+   giving width the row fits without it. */
+@media (max-width: 360px) and (pointer: coarse) {
+  .sb-nav a { min-width: 0; }
+}
+
+/* ---- the download hero: its own section after the stage, the height of
+   the viewport so the reader scrolls INTO it (owner, 2026-09-08). One
+   headline, one sentence, the visitor's platform as the ONE primary on the
+   storm action (the section's bold element), the other platforms as quiet
+   chips, the requirements line, then the agent paste line as the second path.
+   Every value is a site.css token; the two radii are --r-control (chips,
+   buttons, the command box) and --r-surface (nothing here: the section has no
+   card, the paste box is the widget's own). ---- */
+.dl-hero {
+  min-height: 100svh; display: grid; place-items: center;
+  padding: var(--sp-16) var(--gutter-r) var(--sp-16) var(--gutter-l);
+  border-top: 1px solid var(--line);
+  position: relative; z-index: 1;
+}
+.dl-hero-in { width: 100%; max-width: var(--content); display: grid; justify-items: center; text-align: center; gap: var(--sp-4); }
+/* same grid-item guard as .hero > * above: the download one-liner's mono code
+   must not set a grid child's minimum and drag the column out at 360px */
+.dl-hero-in > * { min-width: 0; max-width: 100%; }
+.dl-hero h2 { font-size: var(--fs-h1); line-height: 1.1; letter-spacing: var(--tracking-tight); max-width: 16ch; }
+.dl-sub { color: var(--muted); font-size: var(--fs-lg); line-height: var(--lh-lg); max-width: 46ch; margin-top: calc(-1 * var(--sp-1)); }
+.dl-primary { display: grid; justify-items: center; gap: var(--sp-2); margin-top: var(--sp-4); }
+.dl-cta { min-height: 52px; padding: 0 var(--sp-8); font-size: var(--fs-lg); border-radius: var(--r-control); }
+.alt-cap { margin: 0 0 calc(-1 * var(--sp-1)); color: var(--muted); font-size: var(--fs-sm); line-height: var(--lh-sm); }
+.dl-file { color: var(--muted); font: var(--fs-xs) / var(--lh-xs) var(--font-mono); }
+.dl-alts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-2); }
+.dl-chip {
+  display: inline-flex; align-items: center; min-height: var(--target-sm); padding: 0 var(--sp-3);
+  border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--card);
+  color: var(--secondary); font-size: var(--fs-sm); text-decoration: none;
+  transition: border-color var(--dur-2) var(--ease-std), color var(--dur-2) var(--ease-std);
+}
+.dl-chip:hover, .dl-chip:active { border-color: var(--accent); color: var(--fg); }
+
+/* the divider between the two paths: a labelled hairline, the one structural
+   device here, because it tells the reader the paste line is an alternative */
+.dl-or { width: 100%; display: flex; align-items: center; gap: var(--sp-4); color: var(--muted); font-size: var(--fs-sm); margin-top: var(--sp-6); }
+.dl-or::before, .dl-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.dl-hero #oneliner, .dl-hero #dl-shell { width: 100%; }
+.dl-hero .anywhere { margin-top: var(--sp-2); }
+@media (max-width: 600px) {
+  .dl-hero { min-height: auto; padding-top: var(--sp-12); padding-bottom: var(--sp-12); }
+  .dl-cta { width: 100%; }
+}

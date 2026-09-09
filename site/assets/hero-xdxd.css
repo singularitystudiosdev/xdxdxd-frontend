@@ -1,0 +1,73 @@
+/* hero-xdxd.css: variant B of the landing hero (W5), ported from the
+   cloned-xdxdxd sphere intro onto our #stage. This sheet holds ONLY the intro
+   overlay: the sphere tiles, the bloom, the brand grounds, and the show/hide
+   of the boot-story-only children under .stage[data-hero=xdxd]. The module
+   (hero-xdxd.js) sets data-hero on #stage at boot and appends the overlay
+   (root class .hero-xdxd) to #arena; every selector here starts with
+   .hero-xdxd or .stage[data-hero=xdxd]. The sphere's tiles reuse the rail's
+   own .rail-item markup and hub-boot.css brand styling; the four sphere-only
+   marks (copilot, vscode, windsurf, zed) get their grounds here. Grounds are
+   declared on the overlay root, never :root. No CSS keyframes: the sphere is
+   inline transforms and the finishers are WAAPI (hero-xdxd.js). */
+
+/* the intro layer on #arena: above the hub (z 30), transparent to input */
+.hero-xdxd { position: absolute; inset: 0; overflow: hidden; z-index: 30; pointer-events: none; }
+
+/* boot-story-only children the variants do not use: hub-boot's scanline,
+   mascot, bubble, kv items and tile badge. W6: keyed on the attribute's
+   PRESENCE (.stage[data-hero]) in ONE place, because prepStage (hub-handoff.
+   js) sets data-hero for both variants and both must hide the same children.
+   The margin's install transcript is never rendered (prepStage collapses the
+   column inline); this keeps the empty column visually dead in case anything
+   ever lands in it */
+.stage[data-hero] #scan,
+.stage[data-hero] #mascot,
+.stage[data-hero] #bubble,
+.stage[data-hero] #items,
+.stage[data-hero] #badge { display: none; }
+.stage[data-hero] #margin { opacity: 0; }
+
+/* brand grounds, declared on the overlay root (never :root). Values match the
+   assignment's pairs; inks for the pairs that need one */
+.hero-xdxd {
+  --brand-openai: #000;
+  --brand-openai-ink: #fff;
+  --brand-claude: #d97757;
+  --brand-claude-ink: #fff;
+  --brand-gemini: #fff;
+  --brand-gemini-ink: #1f1f1f;
+  --brand-cursor: #000;
+  --brand-cursor-ink: #fff;
+  --brand-copilot: #24292f;
+  --brand-copilot-ink: #fff;
+  --brand-vscode: #0078d4;
+  --brand-vscode-ink: #fff;
+  --brand-windsurf: #0b100f;
+  --brand-windsurf-ink: #58e5bb;
+  --brand-zed: #084ccf;
+  --brand-zed-ink: #fff;
+}
+
+/* the eight SVG-mark tiles draw the rail's own #sb-ic-* marks on these
+   grounds (scoped to the overlay so hub-boot.css's sidebar rules stay the
+   sidebar's; same values, one source of truth per claim) */
+.hero-xdxd .rail-item[data-app="openai"] { background: var(--brand-openai); color: var(--brand-openai-ink); }
+.hero-xdxd .rail-item[data-app="claude"] { background: var(--brand-claude); color: var(--brand-claude-ink); }
+.hero-xdxd .rail-item[data-app="gemini"] { background: var(--brand-gemini); color: var(--brand-gemini-ink); }
+.hero-xdxd .rail-item[data-app="cursor"] { background: var(--brand-cursor); color: var(--brand-cursor-ink); }
+.hero-xdxd .rail-item[data-app="copilot"] { background: var(--brand-copilot); color: var(--brand-copilot-ink); }
+.hero-xdxd .rail-item[data-app="vscode"] { background: var(--brand-vscode); color: var(--brand-vscode-ink); }
+.hero-xdxd .rail-item[data-app="windsurf"] { background: var(--brand-windsurf); color: var(--brand-windsurf-ink); }
+.hero-xdxd .rail-item[data-app="zed"] { background: var(--brand-zed); color: var(--brand-zed-ink); }
+
+/* image tiles: full-bleed artwork exactly as the sidebar draws its .bleed
+   tiles (devin, hermes, grok, kiro, replit on --surface, lovable on #fff,
+   jetbrains on --surface, bolt, base44 on --surface, v0 on #000) */
+.hero-xdxd .rail-item > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-xdxd .rail-item.hx-face > img { width: 60%; height: 60%; object-fit: contain; margin: auto; }
+.hero-xdxd .rail-item { box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14); }
+.hero-xdxd .rail-item.hx-plain { box-shadow: none; }
+
+/* the bloom: the superbot tile (brand/tile.svg) that flips and grows out of
+   the sphere's collapse; same hairline ring as the rail's own .sb tile */
+.hero-xdxd .hx-bloom { box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14); border-radius: inherit; }

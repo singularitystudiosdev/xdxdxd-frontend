@@ -1,0 +1,583 @@
+/* Superbot site tokens + base. One sheet for every human-facing page
+   (/, /docs, /pair, /account, and the chat header). Pages keep their own
+   layout CSS; anything two pages share lives here.
+
+   Colour + brand: the duostorm kit (harness-notes/brand/duostorm/duostorm.css
+   + duostorm-style-guide.html, chosen 2026-09-08) is the source for the
+   surface ladder, the ink tones, the storm palette and every brand recipe
+   below (.sb-tile, .sb-aurora, .sb-storm-outline, .sb-composer, the storm
+   action). The storm ramp is brand chrome only: the mark, the ring, the
+   composer glow and the filled action ramp, never a surface or a text colour.
+   The one solid accent everywhere else is storm-1 blue (#2b6bff).
+
+   Scales (retrieved 2026-09-01, ledger: harness-notes/design-pass.md):
+   - spacing: 4px base, the Tailwind v4 / Open Props step
+   - type: 12/14/16/18/20 with paired line-heights, h1 fluid via clamp();
+     UI sans (SF Pro Rounded / system-ui) for display and body, mono only
+     for code, terminals, key caps and ledger figures
+   - motion: Material 3 duration ladder, the expo-out curve bun/warp/zed all
+     ship (cubic-bezier(.16,1,.3,1)) for entrances, M3 standard for the rest
+   - focus: 2px accent outline offset 2px (8.4:1 on the page bg)
+   - targets: every control ≥ 24px tall, primary ones 36px (WCAG 2.2 2.5.8);
+     on a touch primary pointer every control lifts to 44px (Apple HIG 44×44pt,
+     Material 48dp; retrieved 2026-09-02, ledger: harness-notes/mobile-e2e.md)
+     through the --target tokens below, so no page carries its own touch rules
+   - gutters: --gutter-l/--gutter-r are the page's side padding, never less
+     than the device's safe-area inset (viewport-fit=cover on every page) */
+
+:root {
+  color-scheme: dark;
+
+  /* ── surfaces + ink (duostorm neutral ladder) ── */
+  --bg: #000000;          /* canvas */
+  --card: #0d0d0d;        /* sidebar / card */
+  --raised: #181818;      /* elevated */
+  --line: #262626;
+  --fg: #ececec;          /* ink */
+  --secondary: #cfcfcf;
+  --muted: #9a9a9a;
+
+  /* ── the one solid accent: focus rings, links, chips, LEDs, selection ── */
+  --accent: #4d8aff;      /* clears 4.5:1 on --card #0d0d0d (5.92:1, WCAG formula); storm-1 #2b6bff stays the brand ramp's start */
+  --accent-ink: #0d0d0d;  /* 5.92:1 on the flat accent: the ink for text painted on filled accent */
+
+  /* ── status coding, unchanged ── */
+  --danger: #c96f6f; --danger-line: #5c3030; --warn: #d9b86b;
+
+  /* ── storm palette (brand chrome only) ── */
+  --storm-0: #00e5c3; --storm-1: #2b6bff; --storm-2: #6a1fd8; --storm-3: #c026d3; --storm-4: #ff3d9a;
+  --storm-gradient: linear-gradient(135deg, var(--storm-0) 0%, var(--storm-1) 25%, var(--storm-2) 50%, var(--storm-3) 75%, var(--storm-4) 100%);
+  --storm-gradient-x: linear-gradient(90deg, var(--storm-0) 0%, var(--storm-1) 25%, var(--storm-2) 50%, var(--storm-3) 75%, var(--storm-4) 100%);
+  --storm-action: linear-gradient(135deg, var(--storm-1) 0%, var(--storm-2) 55%, var(--storm-3) 100%);
+  --action-glow: 0 6px 18px -6px rgb(43 107 255 / 0.55), 0 2px 10px -4px rgb(192 38 211 / 0.35);
+
+  /* ── composer glow ── */
+  --composer-glow: var(--storm-gradient-x);
+  --composer-glow-opacity: 0.38;
+  --composer-glow-blur: 28px;
+
+  /* ── aurora periods (incommensurate, so the composite never repeats) ── */
+  --aurora-a: 9s; --aurora-b: 13s; --aurora-c: 17s;
+
+  /* ── tile + ring ── */
+  --tile-bg: #000000; --tile-radius: 22.5%; --ring-width: 2.73%;
+
+  /* ── type: two families, no more ── */
+  --font-ui: "SF Pro Rounded", "SF Pro Display", -apple-system, system-ui, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* ── two radii: 8px controls, 16px surfaces (pill + 50% are shapes, not
+     values). The legacy aliases below let existing rules collapse onto
+     the pair without touching every page. ── */
+  --r-control: 8px; --r-surface: 16px; --r-pill: 9999px;
+  --r-sm: 8px; --r-md: 8px; --r-lg: 16px; --r-xl: 16px;
+
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+  --sp-8: 32px; --sp-10: 40px; --sp-12: 48px; --sp-16: 64px;
+  --sp-section: clamp(48px, 8vw, 96px);
+
+  --fs-xs: 12px; --lh-xs: 16px;
+  --fs-sm: 14px; --lh-sm: 20px;
+  --fs-base: 16px; --lh-base: 24px;
+  --fs-lg: 18px; --lh-lg: 28px;
+  --fs-xl: 20px; --lh-xl: 28px;
+  --fs-h1: clamp(2rem, 1.2rem + 3.5vw, 3.25rem);
+  --fs-h2: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+  --tracking-tight: -0.02em;
+
+  --dur-1: 100ms; --dur-2: 150ms; --dur-3: 200ms; --dur-4: 300ms; --dur-5: 500ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-std: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  --content: 720px;
+  --container: 1120px;
+  --measure: 62ch;
+  /* the sticky header row = the floating island (10px top margin + the 48px
+     island, border-box) + one --sp-2 breath; scroll-padding-top at :126 reads
+     it so anchors clear the whole island */
+  --nav-h: 58px;
+
+  /* control heights: primary and small. A touch primary pointer lifts both
+     to 44px below; a mouse keeps the tighter desktop scale. */
+  --target: 36px;
+  --target-sm: 28px;
+  /* side padding for every page column: the spacing token, or the safe-area
+     inset when the notch or home-indicator edge is wider (phones in landscape) */
+  --gutter: var(--sp-6);
+  --gutter-l: max(var(--gutter), env(safe-area-inset-left, 0px));
+  --gutter-r: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+@media (max-width: 480px) { :root { --gutter: var(--sp-4); } }
+
+/* ---- touch: the primary pointer is a finger. Every control takes the 44px
+   floor at once; fields hold 16px so iOS Safari stops zooming the page into
+   them on focus; the grey tap flash goes, the :active states below stand in
+   for hover, which a finger never has. ---- */
+@media (pointer: coarse) {
+  :root { --target: 44px; --target-sm: 44px; --nav-h: 62px; } /* the island grows to 52px here (below) so the 44px targets keep 4px of breathing room, and --nav-h follows: 10px top margin + 52px */
+  body input:not([type="hidden"]), body textarea, body select { font-size: max(16px, 1em); }
+}
+/* touch-action: manipulation keeps pan and pinch and drops double-tap zoom on
+   controls, so two fast taps on send or a tab never zoom the page */
+a, button, summary, input, textarea, select, [role="button"], [role="tab"], [role="radio"] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+/* anchor targets land below the sticky header instead of under it */
+html { scroll-padding-top: calc(var(--nav-h) + var(--sp-2)); }
+body {
+  background: var(--bg); color: var(--fg);
+  font: var(--fs-base) / var(--lh-base) var(--font-ui);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  min-height: 100vh; min-height: 100dvh;
+  /* the lander's original crosshair (owner call 2026-09-01: restored after
+     the token-sheet pass cut it), scoped to chrome by the reset below.
+     Controls keep their own cursor:pointer. */
+  cursor: crosshair;
+}
+/* crosshair is chrome-only: prose, log lines, code and fields take the
+   reading cursors back — the page-wide cursor killed the text I-beam. Links
+   and buttons keep their UA / per-component pointers. */
+p, li, dt, dd, blockquote, pre, code, kbd, figcaption, td, th,
+input, textarea, select, label { cursor: auto; }
+a { color: inherit; }
+button, input, textarea, select { font: inherit; color: inherit; }
+img, svg, canvas { display: block; max-width: 100%; }
+h1, h2, h3 { font-weight: 650; letter-spacing: var(--tracking-tight); text-wrap: balance; }
+p { text-wrap: pretty; }
+/* mono is a content font, not a body font: code, key caps, terminal stages
+   and figures carry it (pages scope their own .mono / .term rules) */
+code, kbd, pre { font-family: var(--font-mono); }
+code, kbd { font-size: 0.94em; }
+/* the accent pair at full strength (the token block names selection a solid
+   accent consumer): ink on solid accent is 5.92:1, where the dark ink over the
+   old 35% tint was ~1.7:1 */
+::selection { background: var(--accent); color: var(--accent-ink); }
+/* code blocks get a visible scroll path of their own: a bare pre is
+   white-space: pre with no overflow handling, so one long JSON line set a
+   .more disclosure's content box past the 360px viewport (Q-09's residual) */
+pre { overflow-x: auto; }
+
+/* one focus ring for every control: outline follows border-radius, and
+   the offset keeps it clear of the element's own border */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* text fields already turn their border accent on focus; a soft ring beside
+   it reads as one state instead of two nested boxes */
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* motion is reduced, not removed: entrances become plain fades, ambient
+   loops (carets, stars) stop, hover colour changes stay instant. The
+   sitewide kill-switch below takes the durations the rest of the way to
+   zero; these per-rule guards still own the rest states. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .sb-reveal { animation: none; opacity: 1; } /* the old fade swap kept the stagger's animation-delay (the later longhand wins), so items held invisible through the delay even with the kill-switch; reduce shows the rest state outright */
+  .sb-caret, .caret { animation: none !important; }
+  .sb-aurora { animation: none; }
+  .sb-btn { transition: none; animation: none; }
+  .sb-btn::before { content: none; }
+  .sb-btn:active { transform: none; }
+}
+
+/* the sitewide kill-switch: under reduced motion every animation and
+   transition collapses to a single frame on every page that imports this
+   sheet. The per-rule guards here and on each page stay — they also swap in
+   a non-animated rest state, which a duration alone cannot — so this is the
+   floor that holds when a page forgets its guard. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* cross-document view transitions: a guarded enhancement, not a dependency —
+   support is limited (Chrome 126, Safari 18.2, no Firefox; retrieved
+   2026-09-03). Pages without it just navigate as they always did. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-3); }
+}
+
+/* ---- skip link: the first Tab on any page with a header jumps past it
+   (WCAG 2.4.1); visible only while focused ---- */
+.sb-skip {
+  position: absolute; left: var(--sp-4); top: var(--sp-2); z-index: 20;
+  display: inline-flex; align-items: center; min-height: var(--target); padding: 0 var(--sp-4);
+  background: var(--accent); color: var(--accent-ink); border-radius: var(--r-md);
+  font-size: var(--fs-sm); font-weight: 600; text-decoration: none;
+  box-shadow: 0 0 0 6px var(--bg);
+  /* parked above the viewport by transform, not by top: transform is the only
+     thing the transition animates (top would repaint every frame) */
+  transform: translateY(calc(-100% - var(--sp-4)));
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.sb-skip:focus-visible { transform: none; outline-offset: 2px; }
+/* the skip target is a landmark, not a control: no ring around the page.
+   Checkers still flag the bare outline:none; the offset makes it explicit. */
+main[tabindex="-1"]:focus-visible { outline: none; outline-offset: 0; }
+
+/* ---- header: the floating island — a sticky 920px pill (10px off the top,
+   48px tall), wordmark left, links right. The .sb-header row keeps only
+   sticky/top/z-index/height: no full-width background, no blur, no bottom
+   border — the page shows through on every side of the island. ---- */
+.sb-header {
+  position: sticky; top: 0; z-index: 10; height: var(--nav-h);
+}
+.sb-header-in {
+  /* .sb-header-in IS the island: hairline border, pill radius, translucent
+     card fill with its own blur. The 0 6px 0 14px padding leaves 6px between
+     the Install Now pill and the rounded right end and 14px before the mark. */
+  max-width: 920px; height: 48px; margin: 10px auto 0; padding: 0 6px 0 14px;
+  display: flex; align-items: center; gap: var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+/* coarse pointer: --target and --target-sm are already 44px (:115) and 44px
+   fits the 48px island, but the island grows 4px so the 44px targets keep
+   4px of breathing room instead of 2px; --nav-h lifts in step (:115). */
+@media (pointer: coarse) {
+  .sb-header-in { height: 52px; }
+}
+/* the wordmark: the duotone cat mark at 24px (brand/mark-duo-sm.svg, the OG
+   card's teal/magenta offset cut for small sizes; the tile + storm ring only
+   appear where they can animate) + lowercase text, the .gg suffix plain ink —
+   no accent, no storm on the text */
+.sb-word {
+  /* own colour, not the page's `a` rule: /topup's a{color:accent} was
+     tinting the whole wordmark while every other page read it as fg +
+     plain .gg (2026-09-05) */
+  color: var(--fg);
+  font-size: var(--fs-sm); font-weight: 700; letter-spacing: 0; text-decoration: none;
+  display: inline-flex; align-items: center; min-height: var(--target); padding: 0 var(--sp-2); margin-left: calc(-1 * var(--sp-2));
+  border-radius: var(--r-md);
+}
+/* the spacing rides the mark, not the flex gap: a gap would also separate
+   the "superbot" text node from the ".gg" suffix and split the word */
+.sb-word .sb-word-mark { width: 24px; height: 24px; flex: none; margin-right: 8px; }
+.sb-word .gg { color: var(--fg); }
+.sb-nav { margin-left: auto; display: flex; align-items: center; gap: var(--sp-1); }
+.sb-nav a:not(.sb-btn) {
+  display: inline-flex; align-items: center; min-height: var(--target); padding: 0 var(--sp-3);
+  border-radius: var(--r-md); color: var(--muted); text-decoration: none; font-size: var(--fs-sm);
+  border: 1px solid transparent; white-space: nowrap;
+  transition: color var(--dur-2) var(--ease-std), background-color var(--dur-2) var(--ease-std), border-color var(--dur-2) var(--ease-std);
+}
+.sb-nav a:not(.sb-btn):hover, .sb-nav a:not(.sb-btn):active { color: var(--fg); background: var(--raised); }
+.sb-nav a:not(.sb-btn)[aria-current="page"] { color: var(--fg); }
+/* the header's one filled control (Install Now): the shared .sb-btn recipe at
+   the small pill size — fs-xs ink on the ramp — lifted to the full --target so
+   it nests flush in the island's rounded end (36px pill in a 48px island = 6px
+   inset top and bottom, matching the 6px right padding; the old --target-sm
+   28px read as lost inside the capsule). The @420 tier below keeps the same
+   lift through its .sb-btn.sm line. */
+.sb-nav .sb-btn { min-height: var(--target); padding: 0 var(--sp-3); font-size: var(--fs-xs); border-radius: var(--r-pill); }
+@media (max-width: 480px) {
+  /* below 480 the island goes edge-to-edge with an 8px (--sp-2) side margin:
+     max-width releases so it spans viewport minus the margins; the 10px top
+     margin and the 420/380 tiers below stand */
+  .sb-header-in { max-width: none; margin: 10px var(--sp-2) 0; }
+  .sb-header-in { gap: var(--sp-1); }
+  .sb-nav { gap: 0; }
+  .sb-nav a:not(.sb-btn) { padding: 0 var(--sp-2); }
+  .sb-nav .sb-btn { padding: 0 var(--sp-2); }
+}
+/* 320px (WCAG 1.4.10's width, an iPhone SE): the row ran 2px over at 14px
+   (measured 2026-09-02). 12px text and 4px link padding fit it with room;
+   every target stays 44 wide through min-width. The tier reaches 420px since
+   the chat link joined the row — at 390px the log-in pill was wrapping to two
+   lines (measured 2026-09-04). */
+@media (max-width: 420px) {
+  .sb-word, .sb-nav a:not(.sb-btn) { font-size: var(--fs-xs); } /* :not(.sb-btn): the base recipe at :248 is 0,2,1 and beats a bare 0,1,1 here — the 14px links measured 17px of the 360px overflow */
+  .sb-word .sb-word-mark { margin-right: var(--sp-1); } /* the mark's 8px gap steps down too — the row measured 17px over at 360 */
+  .sb-nav a:not(.sb-btn) { padding: 0 var(--sp-1); min-width: var(--target-sm); justify-content: center; } /* same specificity race as the font size above */
+  .sb-nav .sb-btn.sm { min-height: var(--target); padding: 0 var(--sp-1); } /* .sm: the shared .sb-btn.sm recipe at :346 is 0,2,0 and later — this must out-rank it; min-height stays at the full --target so the pill keeps its flush 36px nest in the island at every width */
+  /* the platform mark nav-store.js puts in the pill (16px + the button's
+     --sp-2 gap) measured the header 23-27px over at 320 on every page
+     (mobile matrix, 2026-09-09); the pill's text label stays, the mark
+     goes below 420 */
+  .sb-nav .sb-btn .sb-os-mark { display: none; }
+}
+/* 360px (the audit's narrow axis): the row still measured 17px over with the
+   420 tier's numbers (the Install Now pill's right edge landed at 377), so the
+   header's inter-item gap goes to zero below 380 to keep it inside the viewport */
+@media (max-width: 380px) {
+  .sb-header-in { gap: 0; }
+}
+/* 320px (WCAG 1.4.10's width) re-measured 2026-09-09 with 'log in' in the
+   row: the island's content box is 284px and the row is 312px (wordmark 118,
+   benchmarks 79, log in 44, pill 79), so the pill's right edge landed at
+   335 on every page that keeps the header on one row (/download wraps it
+   page-locally). Below 360 the island gives up its widest air instead of
+   wrapping, so --nav-h and every anchor's scroll-padding stay true: 4px
+   side margins, --sp-2 left padding, --sp-1 right, the wordmark's right
+   padding and the text links' side padding go to zero (their min-width
+   keeps every target 44 wide). Every label still renders. Same-specificity
+   rules as the 420 tier above, later in the sheet, so they win there. */
+@media (max-width: 360px) {
+  .sb-header-in { margin-left: var(--sp-1); margin-right: var(--sp-1); padding-left: var(--sp-2); padding-right: var(--sp-1); }
+  .sb-word { padding-right: 0; }
+  .sb-nav a:not(.sb-btn) { padding: 0; }
+}
+
+/* ---- buttons: the filled action IS the brand's storm action (duostorm
+   kit .sb-action recipe), tuned to the Discord-Nitro dynamic the owner asked
+   for (2026-09-08): the ramp idles on a slow single-axis breathe, hover
+   slides it and lifts it on the glow while a white sheen sweeps the face
+   once, and the press is a small spatial scale. The sheen is a ::before
+   layer that only ever moves by transform, clipped by the control's own
+   radius. Every other control stays quiet. ---- */
+.sb-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  min-height: var(--target); padding: 0 var(--sp-4); border-radius: var(--r-control);
+  background-color: var(--accent); background-image: var(--storm-action); background-size: 200% 100%; background-position: 0% 50%;
+  color: var(--accent-ink); border: 1px solid transparent;
+  font-size: var(--fs-sm); font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap;
+  position: relative; overflow: hidden;
+}
+/* nowrap is for the label: the download page's primary anchor (a.dl.sb-btn)
+   stacks a mono sha256 <code> under it, and that code must keep its break
+   opportunities or its 64-char min-content drags the whole grid out */
+.sb-btn code { white-space: normal; overflow-wrap: anywhere; min-width: 0; }
+/* the Nitro idle: the ramp drifts on one axis, slow and reversible, so the
+  transition: filter var(--dur-2) var(--ease-std), transform var(--dur-1) var(--ease-std), background-color var(--dur-2) var(--ease-std), background-position 300ms var(--ease-std), border-color var(--dur-2) var(--ease-std), color var(--dur-2) var(--ease-std), box-shadow var(--dur-2) var(--ease-std);
+}
+/* the Nitro idle: the ramp drifts on one axis, slow and reversible, so the
+   control feels alive at rest. An ambient loop, not an interaction — hover
+   and press hand background-position back to the transition, and reduced
+   motion rests the ramp at its start. */
+@media (prefers-reduced-motion: no-preference) {
+  .sb-btn:not([disabled]) { animation: sb-storm-breathe 6s ease-in-out infinite; } /* deliberate */
+  .sb-btn:hover:not([disabled]), .sb-btn:active:not([disabled]), .sb-btn:focus-visible:not([disabled]) { animation: none; }
+}
+@keyframes sb-storm-breathe { 0%, 100% { background-position: 0% 50%; } 60% { background-position: 60% 50%; } }
+/* the sheen: a white diagonal band that parks off the left edge and sweeps
+   the face once per hover entry. Transform only, so it never costs layout. */
+.sb-btn::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 250%;
+  pointer-events: none; border-radius: inherit;
+  background: linear-gradient(115deg, transparent 38%, rgb(255 255 255 / .28) 50%, transparent 62%);
+  transform: translateX(-60%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sb-btn:hover:not([disabled])::before { animation: sb-storm-sheen var(--dur-4) var(--ease-out); } /* hover-entry one-shot rides the recipe's 300ms band */
+}
+@keyframes sb-storm-sheen { from { transform: translateX(-60%); } to { transform: translateX(160%); } }
+/* hover slides the ramp and lifts it on the glow */
+.sb-btn:hover:not([disabled]) { background-position: 100% 50%; box-shadow: var(--action-glow); }
+/* M3 state layer: currentColor at 8% hover / 10% pressed, so the same
+   paint works on the filled and the ghost variant (retrieved 2026-09-03) */
+.sb-btn::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit; background: currentColor; opacity: 0;
+  transition: opacity var(--dur-1) var(--ease-std);
+}
+.sb-btn:hover::after { opacity: .08; }
+.sb-btn:active::after { opacity: .10; }
+@media (prefers-reduced-motion: no-preference) {
+  .sb-btn:active:not([disabled]) { transform: scale(0.96); }
+}
+/* ghost: the quiet variant — card surface, hairline border, accent border
+   on hover. Never carries the ramp, the breathe or the sheen. */
+.sb-btn.ghost { background: var(--card); background-image: none; color: var(--fg); border-color: var(--line); animation: none; }
+.sb-btn.ghost::before { content: none; }
+.sb-btn.ghost:hover:not([disabled]) { border-color: var(--accent); filter: none; background-position: 0% 50%; box-shadow: none; }
+.sb-btn.sm { min-height: var(--target-sm); padding: 0 var(--sp-3); font-size: var(--fs-xs); }
+/* pill: the shape of the referent (the desktop app's Ask Superbot control) —
+   the nav CTA and anything cut that way */
+.sb-btn.pill { border-radius: var(--r-pill); }
+/* disabled drops the ramp for the elevated surface, the label settling on
+   muted (≈5.2:1). Inert to the pointer entirely. */
+.sb-btn[disabled] {
+  pointer-events: none; cursor: default; transform: none; filter: none; animation: none;
+  background-image: none; background: var(--raised); color: var(--muted);
+  border-color: transparent; box-shadow: none;
+}
+.sb-btn[disabled]::before { content: none; }
+.sb-btn.ghost[disabled] { background: var(--card); color: var(--muted); border-color: var(--line); }
+
+/* ---- OS marks (os-detect.js) -------------------------------------------
+   A platform glyph inside a control, left of its label, at currentColor.
+   Two shared recipes: .sb-os-mark for the mark inside any .sb-btn (the
+   header pill via nav-store.js, the download primary, the lander hero), and
+   .dl-mark for the download row's fixed-width mark column. The svg carries
+   its own width and height from os-detect.js osMark(); an empty .dl-mark
+   renders nothing, so a no-JS row is unchanged. ---- */
+.sb-os-mark { display: inline-flex; flex: none; align-items: center; justify-content: center; }
+.sb-os-mark svg { display: block; }
+.dl-mark { display: none; flex: none; width: 20px; height: var(--lh-base); align-items: center; justify-content: center; }
+.dl-mark:not(:empty) { display: inline-flex; }
+.dl-mark svg { display: block; }
+
+/* ---- brand recipes (ported from the duostorm kit) ---- */
+
+/* A brand tile: any square element with the mark image inside. The storm
+   ring is a masked gradient so it stays sharp at every size; .is-ringless
+   drops it for static surfaces that wear the bare mark. */
+.sb-tile {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  aspect-ratio: 1;
+  background: var(--tile-bg);
+  border-radius: var(--tile-radius);
+  overflow: hidden;
+}
+.sb-tile::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: var(--ring-width);
+  background: var(--storm-gradient);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.sb-tile > img { width: 72%; height: 72%; }
+.sb-tile.is-ringless::before { display: none; }
+
+/* The storm aurora: three blurred storm blobs over the electric-blue ground,
+   each centre a registered <percentage> pair animated alternate ease-in-out
+   on its own incommensurate period. Reduced motion rests the blobs at their
+   initial centres: the storm still shows, nothing moves. */
+@property --sa-x1 { syntax: "<percentage>"; inherits: true; initial-value: 18%; }
+@property --sa-y1 { syntax: "<percentage>"; inherits: true; initial-value: 22%; }
+@property --sa-x2 { syntax: "<percentage>"; inherits: true; initial-value: 84%; }
+@property --sa-y2 { syntax: "<percentage>"; inherits: true; initial-value: 30%; }
+@property --sa-x3 { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+@property --sa-y3 { syntax: "<percentage>"; inherits: true; initial-value: 88%; }
+.sb-aurora {
+  background:
+    radial-gradient(circle at var(--sa-x1) var(--sa-y1), var(--storm-0) 0%, transparent 62%),
+    radial-gradient(circle at var(--sa-x2) var(--sa-y2), var(--storm-4) 0%, transparent 62%),
+    radial-gradient(circle at var(--sa-x3) var(--sa-y3), var(--storm-2) 0%, transparent 66%),
+    linear-gradient(var(--storm-1), var(--storm-1));
+  animation:
+    sb-aurora-a var(--aurora-a) ease-in-out infinite alternate,
+    sb-aurora-b var(--aurora-b) ease-in-out infinite alternate,
+    sb-aurora-c var(--aurora-c) ease-in-out infinite alternate;
+}
+@keyframes sb-aurora-a { from { --sa-x1: 18%; --sa-y1: 22%; } to { --sa-x1: 78%; --sa-y1: 74%; } }
+@keyframes sb-aurora-b { from { --sa-x2: 84%; --sa-y2: 30%; } to { --sa-x2: 16%; --sa-y2: 82%; } }
+@keyframes sb-aurora-c { from { --sa-x3: 50%; --sa-y3: 88%; } to { --sa-x3: 56%; --sa-y3: 10%; } }
+@media (prefers-reduced-motion: reduce) {
+  .sb-aurora { animation: none; }
+}
+
+/* A storm-gradient outline on any control (focus ring, selected rail item). */
+.sb-storm-outline {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--raised), var(--raised)) padding-box,
+    var(--storm-gradient) border-box;
+}
+
+/* The composer pill's glow: a blurred storm band under the pill. */
+.sb-composer { position: relative; }
+.sb-composer::before {
+  content: "";
+  position: absolute; inset: -12px -24px;
+  background: var(--composer-glow);
+  filter: blur(var(--composer-glow-blur));
+  opacity: var(--composer-glow-opacity);
+  border-radius: var(--r-pill);
+  z-index: -1;
+}
+
+/* ---- surfaces + inline code ---- */
+.sb-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-surface); }
+p code, li code, .sb-code {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 1px 6px; color: var(--fg);
+  /* a chip holding a URL has no break opportunity of its own: at 320px the
+     uninstall commands on /docs ran 45px past the viewport (2026-09-02) */
+  overflow-wrap: anywhere;
+}
+/* a flag-shaped chip (--uninstall) must not break at its own hyphen into two
+   chips on a phone; long commands keep their wrap and do not take this class */
+.sb-nowrap { white-space: nowrap; }
+
+/* ---- no-JS install fallback ----
+   edge/src/app.ts landerWithFallback renders bare <pre>/<p>/<a> into the
+   #oneliner mount; install-snippet.js replaces them once it runs. These
+   rules only ever paint for a reader without JavaScript. */
+#oneliner:not(.sb-oneliner) { max-width: var(--content); margin-left: auto; margin-right: auto; text-align: left; }
+#oneliner:not(.sb-oneliner) > pre {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-surface);
+  padding: var(--sp-3) var(--sp-4); overflow-x: auto; font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--fg);
+}
+#oneliner:not(.sb-oneliner) > p { color: var(--muted); font-size: var(--fs-sm); line-height: var(--lh-sm); margin-top: var(--sp-2); overflow-wrap: anywhere; }
+#oneliner:not(.sb-oneliner) > p code { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 1px 6px; color: var(--fg); }
+#oneliner:not(.sb-oneliner) > p a { color: var(--accent); }
+
+/* ---- footer ---- */
+.sb-footer {
+  margin-top: var(--sp-section); border-top: 1px solid var(--line);
+  color: var(--muted); font-size: var(--fs-xs); line-height: var(--lh-xs);
+}
+.sb-footer-in {
+  max-width: var(--container); margin: 0 auto;
+  padding: var(--sp-6) var(--gutter-r) max(var(--sp-6), env(safe-area-inset-bottom, 0px)) var(--gutter-l);
+  display: flex; flex-wrap: wrap; gap: var(--sp-3) var(--sp-6); align-items: center; justify-content: space-between;
+}
+/* footer links: 24px is the WCAG floor a mouse gets; a finger gets the 44px
+   token, and the row spacing shrinks so the taller rows do not read as a gap */
+.sb-footer a { color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; min-height: max(24px, var(--target-sm)); }
+.sb-footer a:hover, .sb-footer a:active { color: var(--fg); }
+.sb-footer .links { display: flex; gap: var(--sp-4); flex-wrap: wrap; }
+/* 44 wide as well as tall: "home" is 29px of text, so the padding makes up
+   the rest and the gap shrinks by the same amount */
+@media (pointer: coarse) {
+  .sb-footer a { min-width: var(--target-sm); padding: 0 var(--sp-2); }
+  .sb-footer .links { gap: 0; margin: 0 calc(-1 * var(--sp-2)); }
+}
+.sb-footer .creed { color: var(--accent); }
+/* the trademark line is a sentence a phone reads, not a caption: 14px (the
+   mobile matrix flags it as running copy at the footer's 12px) */
+.sb-footer .tm { font-size: var(--fs-sm); line-height: var(--lh-sm); }
+
+/* ---- entrance: fade-up, staggered by --i, one token per step ---- */
+@keyframes sb-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes sb-fade { from { opacity: 0; } to { opacity: 1; } }
+/* the stagger must live under no-preference: a reduce-scoped guard earlier in
+   this file cannot beat this later same-specificity rule, and a running
+   animation's 0% keyframe overrides any declared rest opacity */
+@media (prefers-reduced-motion: no-preference) {
+  .sb-reveal {
+    animation: sb-rise var(--dur-4) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+}
+
+.sb-visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ---- the whole page reads a quarter larger on wide screens (owner,
+   2026-09-01): a plain zoom rather than a second token sheet. Phones and
+   small laptops stay at 1x so the 390px layouts keep their exact fit.
+   zoom inflates dvh measurements non-uniformly — inside this tier a 100dvh
+   probe resolves 1.25× the real viewport, so any 100dvh consumer overflows
+   by exactly the zoom factor (measured 2026-09-04, zoom, resolved
+   2026-09-08). The pin now lives here instead of per page: the body's own
+   dvh min-height (above) drops to a percentage inside the tier, because
+   percentages still resolve against the real viewport under zoom — the same
+   idiom chat.html proved on its shell. The clean replacement — a rem-based
+   root scale (html font-size 125% with the token sheet in rem) — would
+   rewrite every page's px-token consumption, including sheets this file does
+   not own; until that lands, each new 100dvh consumer needs the same
+   percentage pin. ---- */
+@media (min-width: 1200px) {
+  html { zoom: 1.25; height: 100%; }
+  body { min-height: 100%; }
+}

@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#000000"/>
+<link rel="apple-touch-icon" href="/site/assets/apple-touch-icon.png"/>
+<link rel="manifest" href="/site/assets/site.webmanifest"/>
+<title>superbot.gg · the agent to manage your agents</title>
+<link rel="icon" href="/site/assets/favicon.svg" type="image/svg+xml"/>
+<link rel="stylesheet" href="/site/assets/site.css?v=11"/>
+<link rel="stylesheet" href="/site/assets/hero.css?v=35"/>
+<link rel="stylesheet" href="/site/assets/hub-boot.css?v=48"/>
+<link rel="stylesheet" href="/site/assets/hero-chaos.css?v=3"/>
+<link rel="stylesheet" href="/site/assets/hero-xdxd.css?v=2"/>
+<meta name="description" content="a tiny helper that lives on your machines 24/7: your AI apps on the subscriptions you already pay for, kept fast, kept tidy, and the annoying stuff fixed before you see it."/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="superbot.gg"/>
+<meta property="og:title" content="superbot.gg · the agent to manage your agents"/>
+<meta property="og:description" content="a tiny helper that lives on your machines 24/7: your AI apps on the subscriptions you already pay for, kept fast, kept tidy, and the annoying stuff fixed before you see it."/>
+<meta property="og:url" content="https://xdxdxd.dsh.sh/"/>
+<link rel="canonical" href="https://xdxdxd.dsh.sh/"/>
+<meta property="og:image" content="https://xdxdxd.dsh.sh/site/assets/og.png?v=5"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://xdxdxd.dsh.sh/site/assets/og.png?v=5"/>
+</head>
+<body>
+  <a class="sb-skip" href="#main">skip to content</a>
+  <canvas id="ascii-bg" aria-hidden="true"></canvas>
+  <header class="sb-header"><div class="sb-header-in"><a class="sb-word" href="/" aria-current="page"><img class="sb-word-mark" src="/site/assets/brand/mark-duo-sm.svg" alt="" width="24" height="24"/>superbot<span class="gg">.gg</span></a><nav class="sb-nav" aria-label="site"><a href="/benchmarks">benchmarks</a><a href="/account">log in</a><a class="sb-btn pill sm" href="/download">Install Now</a></nav></div></header><script type="module" src="/site/assets/nav-store.js?v=1"></script>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" data-variant="desk">
+      <div class="hero-copy">
+        <!-- the brand lockup (owner, 2026-09-08): the mark ALONE, no tile, no
+             ring, bigger, close beside the headline so the two read as one
+             unit. The mark is the kit's own geometry inline (mark.svg's face
+             mask), drawn three times: the teal ghost up-left, the magenta ghost
+             down-right, the white face on top. The two ghosts breathe between
+             the glitch ladder's whisper and base offsets (hero.css .sb-glitch);
+             the face never moves. -->
+        <div class="sb-lockup sb-reveal" style="--i:0">
+          <svg class="sb-glitch" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+            <defs>
+              <mask id="sb-lockup-face" maskUnits="userSpaceOnUse" x="-30" y="-30" width="160" height="160">
+                <g fill="#fff"><rect x="14" y="32" width="72" height="54" rx="15"/><path d="M14 46V28Q14 20 21 21Q28 24 36 32Z"/><path d="M86 46V28Q86 20 79 21Q72 24 64 32Z"/></g>
+                <g fill="#000"><ellipse cx="35" cy="58" rx="8" ry="11"/><ellipse cx="65" cy="58" rx="8" ry="11"/></g>
+              </mask>
+            </defs>
+            <rect class="sb-glitch-a" x="-30" y="-30" width="160" height="160" fill="#00e5c3" mask="url(#sb-lockup-face)"/>
+            <rect class="sb-glitch-b" x="-30" y="-30" width="160" height="160" fill="#c026d3" mask="url(#sb-lockup-face)"/>
+            <rect x="-30" y="-30" width="160" height="160" fill="#ffffff" mask="url(#sb-lockup-face)"/>
+          </svg>
+          <h1>the agent<br/>to manage<br/>your agents.</h1>
+        </div>
+      </div>
+
+      <!-- the stage: the boot-sequence hero (promoted from archive/site/home-hub-boot.html,
+           2026-09-06). hub-boot.js drives a 32s story in #stage: flat glyph row →
+           mascot boots in the terminal margin → scans and gathers apps/rules/mcps
+           → gulps them → the app icon springs out and FLIPs into the real hub →
+           a phone slides up in sync → he parks beside it with a replay button.
+           Reduced motion renders the held end state. Styles: hub-boot.css (its
+           hero.css-coexistence overrides are commented inline). The incident-card
+           stage it replaced still lives on /site/lander-agent.html's git history
+           and the gallery's V0 card. -->
+      <div class="desk sb-reveal" id="desk" style="--i:1" data-ascii-damp>
+      <div class="stage" id="stage" role="figure" aria-label="superbot boots in a terminal, gathers your apps, rules and mcp servers, becomes one hub, and the same hub appears on your phone">
+        <div class="stage-bar"><i></i><i></i><i></i><span>superbot</span><em class="led" id="led"></em></div>
+        <div class="body">
+          <div class="margin" id="margin" aria-hidden="true"></div>
+          <button class="replay-park" id="replay" type="button" hidden aria-label="play again">↻</button>
+          <div class="arena" id="arena">
+            <div class="scan" id="scan" aria-hidden="true"></div>
+            <pre class="mascot" id="mascot"></pre>
+            <div class="bubble" id="bubble" aria-hidden="true"><span class="t"></span><span class="caret"></span></div>
+            <div id="items" aria-hidden="true"></div>
+            <div class="badge" id="badge" aria-hidden="true"><img src="/site/assets/brand/tile.svg" alt="" width="88" height="88"/></div>
+
+            <!-- the hub: the real app's layout (rail, chats, chat lane, superbot panel) -->
+            <div class="hub" id="hub" aria-hidden="true">
+              <nav class="rail inner">
+                <!-- `sel` marks the OPEN client: the tab tour moves it (hub-boot.js
+                     TABS), and Superbot merely starts with it -->
+                <span class="rail-item sb sel"><span class="sb-aura" aria-hidden="true"><span class="sb-aura-field"></span><span class="sb-aura-spectrum"></span><span class="sb-aura-orb a"></span><span class="sb-aura-orb b"></span><span class="sb-aura-sheen"></span></span><img class="tile" src="/site/assets/brand/tile.svg" alt="" width="44" height="44"/><img class="face" src="/site/assets/brand/mark.svg" alt="" width="44" height="44"/></span>
+                <span class="rail-div"></span>
+                <span class="rail-item" data-app="openai"><svg><use href="#sb-ic-openai"/></svg><i class="dot"></i></span>
+                <span class="rail-item" data-app="claude"><svg><use href="#sb-ic-claude"/></svg><i class="dot bad"></i></span>
+                <span class="rail-item" data-app="gemini"><svg><use href="#sb-ic-gemini"/></svg><i class="dot"></i></span>
+                <span class="rail-item" data-app="cursor"><svg><use href="#sb-ic-cursor"/></svg><i class="dot"></i></span>
+                <span class="rail-div"></span>
+                <!-- the Utilities folder: plug, key, folder, sparkles in a 2x2 grid,
+                     green count dot; then the add tile on the raised surface -->
+                <span class="rail-item folder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                  <i class="dot"></i>
+                </span>
+                <span class="rail-item add">+</span>
+              </nav>
+              <div class="chats inner">
+                <div class="side-head"><img src="/site/assets/brand/mark-clean.svg" alt="" width="14" height="14"/><b>superbot.gg</b><i class="side-ic ic-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg></i><i class="side-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg></i></div>
+                <span class="row new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L13 14l-4 1 1-4Z"/></svg>New chat</span>
+                <span class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>Manage Context</span>
+                <span class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11"/><path d="M14.6 9.4c-.9-1.3-5.8-1.4-5.8.9 0 2.5 6.2 1.4 6.2 3.8 0 2.3-5.2 2.1-6.4.7"/></svg>View Savings</span>
+                <span class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17v-6"/><path d="M13 17V7"/><path d="M18 17v-3"/></svg>View Usage</span>
+                <span class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 2 2 4-4"/><path d="m3 14 2 2 4-4"/><path d="M13 6h8"/><path d="M13 16h8"/></svg>Setup<i class="cnt">3</i></span>
+                <div class="cap-row"><span class="cap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>Recents</span><span class="cnt-r">1</span></div>
+                <div class="today">Today</div>
+                <span class="row chat on"><i class="sp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></i><span class="t">which rate limiter…</span><em>12m</em></span>
+                <span class="row chat"><i class="sp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></i><span class="t">rank the import pa…</span><em>3h</em></span>
+                <span class="row chat"><i class="sp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></i><span class="t">trello card test</span><em>1d</em></span>
+                <span class="row chat"><i class="sp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></i><span class="t">dedupe the always…</span><em>3d</em></span>
+                <span class="row chat"><i class="sp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></i><span class="t">macapp notarizati…</span><em>1w</em></span>
+                <!-- docks above the user row once the phone has gone (hub-boot.js
+                     adds .slim to #hub); collapsed to zero height until then -->
+                <div class="ctx-mini" aria-hidden="true"><div class="cx-in">
+                  <div class="cx"><span>this week</span><b>$5.15</b></div>
+                  <div class="bar"><i style="--p:82%"></i></div>
+                  <div class="cx"><span>context</span><b>361k</b></div>
+                </div></div>
+                <div class="user"><span class="avatar" style="--c:var(--raised)">D<i class="dot ok"></i></span><span class="u-tx"><b><a href="mailto:hi@superbot.gg"></b><small>no balance yet</small></span><svg class="u-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
+              </div>
+              <div class="main inner">
+                <div class="chat-head"><b>chat</b><span class="search">Search<kbd>⌘K</kbd></span><span class="ask"><img src="/site/assets/brand/mark-clean.svg" alt="" width="12" height="12"/>Ask Superbot</span><span class="ptoggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg></span></div>
+                <div class="feed" id="feed">
+                  <div class="welcome"><span class="w-ic"><img src="/site/assets/brand/mark-clean.svg" alt="" width="14" height="14"/></span><span class="w-tx"><b>Welcome to #chat</b><small>This is the start of your conversation with Superbot.</small></span></div>
+                  <div class="date-div">September 5, 2026</div>
+                  <!-- the story's own feed: Superbot speaking, never the reader typing
+                       (owner, 2026-09-08: no user-sent messages, a quieter screen).
+                       Two messages, no cards: the answer and the sync line. -->
+                  <div class="msg" data-m="1"><span class="avatar sb"><img src="/site/assets/brand/mark-clean.svg" alt=""/></span><div class="m-main"><div class="m-head"><span class="m-name">superbot</span><span class="app">APP</span><span class="m-when">11:15 AM</span></div><div class="m-text">your ChatGPT, Claude, Gemini and Cursor are all wired in, on the subscriptions you already pay for. one window, every agent.</div></div></div>
+                  <div class="msg" data-m="2"><span class="avatar sb"><img src="/site/assets/brand/mark-clean.svg" alt=""/></span><div class="m-main"><div class="m-head"><span class="m-name">superbot</span><span class="app">APP</span><span class="m-when">11:16 AM</span></div><div class="m-text">and the same chat is on your phone already. one copy, every device.</div></div></div>
+                </div>
+                <!-- act two's transcript, stacked over the story's own feed (hub-boot.js fills it) -->
+                <div class="feed tour" id="tour-feed" aria-hidden="true"></div>
+                <div class="composer" aria-hidden="true"><div class="pill"><span class="plus">+</span><span class="ph">How can superbot help you today?</span><span class="picker">superbot ▾</span><span class="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg></span></div></div>
+              </div>
+              <aside class="panel inner">
+                <div class="p-head">Superbot<small>relay, live</small></div>
+                <div class="card pc did"><div class="c-title">What Superbot did<i class="dot"></i></div>
+                  <div class="did-row"><small>2h</small><span>trimmed 1.2M context tokens this week, saved $18.30 of $46.10 in Cursor</span></div>
+                  <div class="did-row"><small>5h</small><span>renewed your expired Grok login, 3 refused requests rescued in Codex</span></div>
+                  <div class="did-row"><small>1d</small><span>put your 4 rules files in all 3 clients, 315.8k tokens, one copy</span></div>
+                </div>
+                <div class="two">
+                  <div class="card pc"><div class="c-title">This week<i class="dot"></i></div><b class="big">$5.15</b><small>140 calls</small><div class="bar"><i style="--p:82%"></i></div><small>12k tok left of 74k</small></div>
+                  <div class="card pc"><div class="c-title">Context<i class="dot warn"></i></div><b class="big">361k tok</b><small>always on, 2 of 6 rules</small><div class="bar warn"><i style="--p:58%"></i></div></div>
+                </div>
+                <div class="card pc"><div class="c-title">Needs a fix<i class="dot warn"></i></div>
+                  <div class="fix-row"><span>xai expiring</span><span class="act">renew</span></div>
+                  <div class="fix-row"><span>postgres down</span><span class="act">fix</span></div>
+                  <div class="fix-row"><span>Grok needs auth</span><span class="act">connect</span></div>
+                </div>
+                <div class="two">
+                  <div class="card pc"><div class="c-title">Apps wired<i class="dot warn"></i></div><b class="big">6/7</b><div class="chips"><span>cu</span><span>cc</span><span>co</span><span>wi</span><span>gc</span><span>ze</span><span class="off">cl</span></div></div>
+                  <div class="card pc"><div class="c-title">MCP servers<i class="dot bad"></i></div><b class="big">2/3</b><small>healthy</small></div>
+                </div>
+                <div class="card pc stuff"><div class="c-title">Your stuff<i class="dot"></i></div><div class="stuff"><span class="s1">6 rules</span><span class="s2">7 skills</span><span class="s3">3 mcps</span><span class="s4">2 talents</span></div></div>
+                <div class="card pc devices"><div class="c-title">Devices<i class="dot"></i></div><b class="big">2</b><small>MacBook Pro, iPhone 17</small><span class="act">+ link a device</span></div>
+              </aside>
+            </div>
+
+            <!-- the sync beam: a rail that dissolves at both ends, with one light
+                 running it. Both gradients are userSpaceOnUse and their coordinates
+                 are written by hub-boot.js (layout() places the curve, tick() slides
+                 the light), so the run rides the hero's own rAF clock and inherits
+                 its offscreen pause and the `pace` cuts' timing for free. -->
+            <svg class="beam" id="beam" aria-hidden="true">
+              <defs>
+                <linearGradient id="beam-fade" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" class="g-off"/><stop offset="0.2" class="g-rail"/>
+                  <stop offset="0.8" class="g-rail"/><stop offset="1" class="g-off"/>
+                </linearGradient>
+                <linearGradient id="beam-run" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" class="g-off"/><stop offset="0.45" class="g-hot"/>
+                  <stop offset="0.6" class="g-hot"/><stop offset="1" class="g-off"/>
+                </linearGradient>
+              </defs>
+              <path class="rail" id="beam-path" d=""/>
+              <path class="run" id="beam-run-path" d=""/>
+            </svg>
+
+            <div class="phone" id="phone" aria-hidden="true">
+              <!-- the phone is the mobile app's thread screen as it looks today
+                   (superbot-mobile docs/design/mobile-theme.html, frame 2): the
+                   status band, the "# superbot" header with the back and pane
+                   glyphs, the avatar-less transcript, the one-pill composer
+                   inside the storm ring with the send circle outside it -->
+              <div class="screen">
+                <div class="ph-status"><span>9:41</span><span class="ph-sig">&#9679;&#9679;&#9679;</span></div>
+                <div class="ph-head"><i class="ph-g">&#8249;</i><b># superbot</b><i class="ph-g">&#9636;</i><i class="ph-g">&#9638;</i><span class="sync" id="sync">synced</span></div>
+                <div class="ph-feed">
+                  <div class="ph-div">Today</div>
+                  <div class="msg" data-m="3"><div class="ph-turn">your ChatGPT, Claude, Gemini and Cursor are all wired in. one window, every agent.</div></div>
+                  <div class="msg" data-m="4"><div class="ph-turn">and the same chat is here. one copy, every device.</div></div>
+                </div>
+                <div class="ph-composer"><span class="ph-ring"><span class="ph-pill"><i>+</i><span>Ask Superbot anything</span><em>Platforms</em></span></span><span class="ph-send"></span></div>
+                <div class="ph-home"></div>
+              </div>
+            </div>
+            <div class="phone-label" id="phone-label">synced · 2 devices</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- the client rail: the stage's own bottom edge. Each mark is a
+           quiet link to its recipe page (no recipe yet → /docs#clients).
+           A static row since the boot hero replaced the incident stage
+           (2026-09-06): nothing lights the marks any more, names open on
+           hover. VS Code Insiders is deliberately absent (same product
+           and mark as the vs code row); the windsurf row keeps that name
+           (the mark and the recipe are both Windsurf's). Ghost surfaces
+           only — the install box stays the page's only primary action. -->
+      <nav class="dock" id="dock" aria-label="clients superbot installs into">
+        <span class="lab">native in</span>
+        <!-- icon registry: one <symbol> per mark, instantiated below with
+             <use> (it must precede the first one). Everything is drawn in
+             currentColor so the marks track the row colour. Provenance —
+             modelled on simple-icons (CC0): claude, cursor, windsurf, cline,
+             copilot (githubcopilot), gemini (googlegemini), qwen. Hand-drawn
+             originals: openai (one mark shared by codex cli + chatgpt
+             desktop), vs code, zed, opencode, roo code, kilo code, continue,
+             kiro, amazon q. -->
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+          <defs>
+                  <symbol id="sb-ic-claude" viewBox="0 0 24 24" fill="currentColor"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></symbol>
+                  <symbol id="sb-ic-cursor" viewBox="0 0 24 24" fill="currentColor"><path d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></symbol>
+                  <symbol id="sb-ic-vscode" viewBox="0 0 100 100" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M70.9119 99.3171C72.4869 99.9307 74.2828 99.8914 75.8725 99.1264L96.4608 89.2197C98.6242 88.1787 100 85.9892 100 83.5872V16.4133C100 14.0113 98.6243 11.8218 96.4609 10.7808L75.8725 0.873756C73.7862 -0.130129 71.3446 0.11576 69.5135 1.44695C69.252 1.63711 69.0028 1.84943 68.769 2.08341L29.3551 38.0415L12.1872 25.0096C10.589 23.7965 8.35363 23.8959 6.86933 25.2461L1.36303 30.2549C-0.452552 31.9064 -0.454633 34.7627 1.35853 36.417L16.2471 50.0001L1.35853 63.5832C-0.454633 65.2374 -0.452552 68.0938 1.36303 69.7453L6.86933 74.7541C8.35363 76.1043 10.589 76.2037 12.1872 74.9905L29.3551 61.9587L68.769 97.9167C69.3925 98.5406 70.1246 99.0104 70.9119 99.3171ZM75.0152 27.2989L45.1091 50.0001L75.0152 72.7012V27.2989Z"/></symbol>
+                  <symbol id="sb-ic-openai" viewBox="0 0 2406 2406" fill="currentColor"><path id="sb-oai-petal" d="M1107.3 299.1c-197.999 0-373.9 127.3-435.2 315.3L650 743.5v427.9c0 21.4 11 40.4 29.4 51.4l344.5 198.515V833.3h.1v-27.9L1372.7 604c33.715-19.52 70.44-32.857 108.47-39.828L1447.6 450.3C1361 353.5 1237.1 298.5 1107.3 299.1zm0 117.5-.6.6c79.699 0 156.3 27.5 217.6 78.4-2.5 1.2-7.4 4.3-11 6.1L952.8 709.3c-18.4 10.4-29.4 30-29.4 51.4V1248l-155.1-89.4V755.8c-.1-187.099 151.601-338.9 339-339.2z"/><use href="#sb-oai-petal" transform="rotate(60 1203 1203)"/><use href="#sb-oai-petal" transform="rotate(120 1203 1203)"/><use href="#sb-oai-petal" transform="rotate(180 1203 1203)"/><use href="#sb-oai-petal" transform="rotate(240 1203 1203)"/><use href="#sb-oai-petal" transform="rotate(300 1203 1203)"/></symbol>
+                  <symbol id="sb-ic-gemini" viewBox="0 0 24 24" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></symbol>
+                  <symbol id="sb-ic-zed" viewBox="0 0 24 24" fill="currentColor"><path d="M2.25 1.5a.75.75 0 0 0-.75.75v16.5H0V2.25A2.25 2.25 0 0 1 2.25 0h20.095c1.002 0 1.504 1.212.795 1.92L10.764 14.298h3.486V12.75h1.5v1.922a1.125 1.125 0 0 1-1.125 1.125H9.264l-2.578 2.578h11.689V9h1.5v9.375a1.5 1.5 0 0 1-1.5 1.5H5.185L2.562 22.5H21.75a.75.75 0 0 0 .75-.75V5.25H24v16.5A2.25 2.25 0 0 1 21.75 24H1.655C.653 24 .151 22.788.86 22.08L13.19 9.75H9.75v1.5h-1.5V9.375A1.125 1.125 0 0 1 9.375 8.25h5.314l2.625-2.625H5.625V15h-1.5V5.625a1.5 1.5 0 0 1 1.5-1.5h13.19L21.438 1.5z"/></symbol>
+                  <symbol id="sb-ic-windsurf" viewBox="0 0 24 24" fill="currentColor"><path d="M23.55 5.067c-1.2038-.002-2.1806.973-2.1806 2.1765v4.8676c0 .972-.8035 1.7594-1.7597 1.7594-.568 0-1.1352-.286-1.4718-.7659l-4.9713-7.1003c-.4125-.5896-1.0837-.941-1.8103-.941-1.1334 0-2.1533.9635-2.1533 2.153v4.8957c0 .972-.7969 1.7594-1.7596 1.7594-.57 0-1.1363-.286-1.4728-.7658L.4076 5.1598C.2822 4.9798 0 5.0688 0 5.2882v4.2452c0 .2147.0656.4228.1884.599l5.4748 7.8183c.3234.462.8006.8052 1.3509.9298 1.3771.313 2.6446-.747 2.6446-2.0977v-4.893c0-.972.7875-1.7593 1.7596-1.7593h.003a1.798 1.798 0 0 1 1.4718.7658l4.9723 7.0994c.4135.5905 1.05.941 1.8093.941 1.1587 0 2.1515-.9645 2.1515-2.153v-4.8948c0-.972.7875-1.7594 1.7596-1.7594h.194a.22.22 0 0 0 .2204-.2202v-4.622a.22.22 0 0 0-.2203-.2203Z"/></symbol>
+                  <symbol id="sb-ic-cline" viewBox="0 0 24 24" fill="currentColor"><path d="m23.365 13.556-1.442-2.895V8.994c0-2.764-2.218-5.002-4.954-5.002h-2.464c.178-.367.276-.779.276-1.213A2.77 2.77 0 0 0 12.018 0a2.77 2.77 0 0 0-2.763 2.779c0 .434.098.846.276 1.213H7.067c-2.736 0-4.954 2.238-4.954 5.002v1.667L.64 13.549c-.149.29-.149.636 0 .927l1.472 2.855v1.667C2.113 21.762 4.33 24 7.067 24h9.902c2.736 0 4.954-2.238 4.954-5.002V17.33l1.44-2.865c.143-.286.143-.622.002-.91m-12.854 2.36a2.27 2.27 0 0 1-2.261 2.273 2.27 2.27 0 0 1-2.261-2.273v-4.042A2.27 2.27 0 0 1 8.249 9.6a2.267 2.267 0 0 1 2.262 2.274zm7.285 0a2.27 2.27 0 0 1-2.26 2.273 2.27 2.27 0 0 1-2.262-2.273v-4.042A2.267 2.267 0 0 1 15.535 9.6a2.267 2.267 0 0 1 2.261 2.274z"/></symbol>
+                  <symbol id="sb-ic-copilot" viewBox="0 0 24 24" fill="currentColor"><path d="M23.922 16.997C23.061 18.492 18.063 22.02 12 22.02 5.937 22.02.939 18.492.078 16.997A.641.641 0 0 1 0 16.741v-2.869a.883.883 0 0 1 .053-.22c.372-.935 1.347-2.292 2.605-2.656.167-.429.414-1.055.644-1.517a10.098 10.098 0 0 1-.052-1.086c0-1.331.282-2.499 1.132-3.368.397-.406.89-.717 1.474-.952C7.255 2.937 9.248 1.98 11.978 1.98c2.731 0 4.767.957 6.166 2.093.584.235 1.077.546 1.474.952.85.869 1.132 2.037 1.132 3.368 0 .368-.014.733-.052 1.086.23.462.477 1.088.644 1.517 1.258.364 2.233 1.721 2.605 2.656a.841.841 0 0 1 .053.22v2.869a.641.641 0 0 1-.078.256Zm-11.75-5.992h-.344a4.359 4.359 0 0 1-.355.508c-.77.947-1.918 1.492-3.508 1.492-1.725 0-2.989-.359-3.782-1.259a2.137 2.137 0 0 1-.085-.104L4 11.746v6.585c1.435.779 4.514 2.179 8 2.179 3.486 0 6.565-1.4 8-2.179v-6.585l-.098-.104s-.033.045-.085.104c-.793.9-2.057 1.259-3.782 1.259-1.59 0-2.738-.545-3.508-1.492a4.359 4.359 0 0 1-.355-.508Zm2.328 3.25c.549 0 1 .451 1 1v2c0 .549-.451 1-1 1-.549 0-1-.451-1-1v-2c0-.549.451-1 1-1Zm-5 0c.549 0 1 .451 1 1v2c0 .549-.451 1-1 1-.549 0-1-.451-1-1v-2c0-.549.451-1 1-1Zm3.313-6.185c.136 1.057.403 1.913.878 2.497.442.544 1.134.938 2.344.938 1.573 0 2.292-.337 2.657-.751.384-.435.558-1.15.558-2.361 0-1.14-.243-1.847-.705-2.319-.477-.488-1.319-.862-2.824-1.025-1.487-.161-2.192.138-2.533.529-.269.307-.437.808-.438 1.578v.021c0 .265.021.562.063.893Zm-1.626 0c.042-.331.063-.628.063-.894v-.02c-.001-.77-.169-1.271-.438-1.578-.341-.391-1.046-.69-2.533-.529-1.505.163-2.347.537-2.824 1.025-.462.472-.705 1.179-.705 2.319 0 1.211.175 1.926.558 2.361.365.414 1.084.751 2.657.751 1.21 0 1.902-.394 2.344-.938.475-.584.742-1.44.878-2.497Z"/></symbol>
+                  <symbol id="sb-ic-opencode" viewBox="0 0 24 24" fill="currentColor"><path d="M22 24H2V0h20zM17 4.8H7v14.4h10z"/></symbol>
+                  <symbol id="sb-ic-qwen" viewBox="0 0 24 24" fill="currentColor"><path d="M23.919 14.545 20.817 9.17l1.47-2.544a.56.56 0 0 0 0-.566l-1.633-2.83a.57.57 0 0 0-.49-.283h-6.207L12.487.402a.57.57 0 0 0-.49-.284H8.732a.56.56 0 0 0-.49.284L5.139 5.775h-2.94a.56.56 0 0 0-.49.284L.077 8.887a.56.56 0 0 0 0 .567L3.18 14.83l-1.47 2.545a.56.56 0 0 0 0 .566l1.634 2.83a.57.57 0 0 0 .49.283h6.205l1.47 2.545a.57.57 0 0 0 .49.284h3.266a.57.57 0 0 0 .49-.284l3.104-5.375h2.94a.57.57 0 0 0 .49-.283l1.634-2.828a.55.55 0 0 0-.004-.568M8.733.686l1.634 2.828-1.634 2.828H21.8L20.164 9.17H7.425L5.63 6.06Zm1.306 19.801-6.205-.002 1.634-2.83h3.265L2.201 6.344h3.267q3.182 5.517 6.367 11.032zm10.124-5.66L18.53 12l-6.532 11.315-1.634-2.83c2.129-3.673 4.25-7.351 6.373-11.028h3.592l3.102 5.374z"/></symbol>
+                  <symbol id="sb-ic-roo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="4.5"/><path d="M8.5 17V7.5h4a2.75 2.75 0 0 1 0 5.5H8.5m3.5 0 3.5 4"/></symbol>
+                  <symbol id="sb-ic-kilo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="4.5"/><path d="M8.5 7v10M15.5 7l-6.5 5 6.5 5"/></symbol>
+                  <symbol id="sb-ic-continue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M10 8.2v7.6l6.2-3.8z" fill="currentColor" stroke="none"/></symbol>
+                  <symbol id="sb-ic-kiro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5v15M17.5 4.5l-8 7.5 8 7.5"/></symbol>
+                  <symbol id="sb-ic-amazonq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm0 3.2a3.3 3.3 0 1 1 0 6.6 3.3 3.3 0 0 1 0-6.6Z" fill="currentColor" stroke="none"/><path d="m15.2 15.2 3.6 3.6" stroke-width="2.4"/></symbol>
+                </defs>
+        </svg>
+        <ul class="wall-list">
+        <li><a data-app="claude-code" href="/install/claude.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-claude"/></svg><span>claude code</span></a></li>
+        <li><a data-app="cursor" href="/install/cursor.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-cursor"/></svg><span>cursor</span></a></li>
+        <li><a data-app="vscode" href="/install/vscode.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-vscode"/></svg><span>vs code</span></a></li>
+        <li><a data-app="codex" href="/install/codex.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-openai"/></svg><span>codex cli</span></a></li>
+        <li><a data-app="chatgpt" href="/install/chatgpt.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-openai"/></svg><span>chatgpt desktop</span></a></li>
+        <li><a data-app="gemini" href="/install/gemini.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-gemini"/></svg><span>gemini cli</span></a></li>
+        <li><a data-app="zed" href="/install/zed.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-zed"/></svg><span>zed</span></a></li>
+        <li><a data-app="windsurf" href="/install/windsurf.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-windsurf"/></svg><span>windsurf</span></a></li>
+        <li><a data-app="claude-desktop" href="/install/claude-desktop.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-claude"/></svg><span>claude desktop</span></a></li>
+        <li><a data-app="cline" href="/install/cline.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-cline"/></svg><span>cline</span></a></li>
+        <li><a data-app="roo" href="/docs#clients"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-roo"/></svg><span>roo code</span></a></li>
+        <li><a data-app="kilo" href="/docs#clients"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-kilo"/></svg><span>kilo code</span></a></li>
+        <li><a data-app="continue" href="/install/continue.md"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-continue"/></svg><span>continue</span></a></li>
+        <li><a data-app="copilot" href="/docs#clients"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-copilot"/></svg><span>copilot cli</span></a></li>
+        <li><a data-app="opencode" href="/docs#clients"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-opencode"/></svg><span>opencode</span></a></li>
+        <li><a data-app="qwen" href="/docs#clients"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-qwen"/></svg><span>qwen code</span></a></li>
+        <li><a data-app="kiro" href="/docs#clients"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-kiro"/></svg><span>kiro</span></a></li>
+        <li><a data-app="amazonq" href="/docs#clients"><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#sb-ic-amazonq"/></svg><span>amazon q</span></a></li>
+        </ul>
+      </nav>
+      </div>
+
+    </section>
+
+    <!-- the download hero (owner, 2026-09-08: "make the user scroll past the
+         animation to see it, and then it can be an actual hero section... a
+         proper download hero section that people are used to seeing"). Its own
+         full-height section after the stage: one headline, one sentence, the
+         visitor's platform as the ONE primary (the storm action, the page's
+         bold element), the other platforms as quiet chips, the requirements
+         line, then the agent paste line as the second path (the install
+         widget mounts into #oneliner as before). The script at the foot picks
+         the platform; without JavaScript every platform chip stays and the
+         primary points at /download. -->
+    <section class="dl-hero" id="download" aria-labelledby="dl-title">
+      <div class="dl-hero-in">
+        <h2 id="dl-title">get Superbot</h2>
+        <p class="dl-sub">one app, every AI client on your machine. free while in beta.</p>
+        <div class="dl-primary">
+          <a class="sb-btn dl-cta" id="dl-cta" href="/download" data-os=""><span class="sb-os-mark"></span><span class="dl-cta-label">Download the desktop app</span></a>
+          <span class="dl-file" id="dl-file">Superbot-0.1.0-arm64.dmg</span>
+        </div>
+        <ul class="dl-alts" id="dl-alts" aria-label="other platforms">
+          <li><a class="dl-chip" data-os="mac" href="https://github.com/kek-kek-kek/superbot-desktop/releases/download/v0.1.0/Superbot-0.1.0-arm64.dmg">macOS</a></li>
+          <li><a class="dl-chip" data-os="windows" href="https://github.com/kek-kek-kek/superbot-desktop/releases/download/v0.1.0/Superbot-Setup-0.1.0.exe">Windows</a></li>
+          <li><a class="dl-chip" data-os="linux" href="https://github.com/kek-kek-kek/superbot-desktop/releases/download/v0.1.0/Superbot-0.1.0.AppImage">Linux</a></li>
+          <li><a class="dl-chip" href="/download">every installer</a></li>
+        </ul>
+        <!-- the terminal path: one copyable bootstrap line for the visitor's
+             platform (mountCommandRow, install-snippet.js), captioned by its
+             own divider like the agent paste row below. The page script
+             mounts it from the same `os` the CTA resolves, and hides the
+             whole block for a phone or an unknown platform — the download
+             button is the only path there. -->
+        <div class="dl-or"><span>or in a terminal</span></div>
+        <div id="dl-shell" data-ascii-damp></div>
+        <!-- the one label over the command: the widget's own row label is
+             blanked under noDownload, so the divider says it once (owner,
+             2026-09-08: "less words", keep the copyable bootstrap line) -->
+        <div class="dl-or"><span>or paste this into your coding agent</span></div>
+        <div id="oneliner" data-ascii-damp><pre><code>install the Superbot MCP server globally: https://xdxdxd.dsh.sh/mcp</code></pre><p>paste that to a coding agent (claude code, codex, cursor...) and it wires that client to your account. No installer: the MCP server is hosted here.</p><p>prefer an app? <a href="/download">get the desktop app</a> and it wires every client on this machine for you.</p><p><a href="/docs#clients">Setup for every client</a></p></div>
+        <p class="anywhere" data-ascii-damp id="anywhere">
+          <b>the last MCP you'll ever need. it works from any coding app.</b>
+          nothing to configure, nothing to sign up for. try it, and it's there.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="sb-footer" data-ascii-damp>
+    <div class="sb-footer-in">
+      <span class="creed">always learning.</span>
+      <nav class="links" aria-label="footer">
+        <a href="/docs">quickstart</a>
+        <a href="/docs#clients">setup for every client</a>
+        <a href="https://ezolabs.net">created by EZO Labs Inc</a>
+      </nav>
+      <p class="tm">names and marks belong to their owners.</p>
+    </div>
+  </footer>
+
+<script src="/site/assets/ascii-bg.js?v=3" data-bg="stars" data-color="236,236,236" data-fade="0.32"></script>
+<script type="module">
+  import { consoleEgg } from '/site/assets/mascot.js?v=13';
+  import { mountInstallSnippet, mountCommandRow, detectArchEvidence } from '/site/assets/install-snippet.js?v=37';
+  import { detectPlatform, storeLink, storeLabel, osMark, OS_MARK_PATHS } from '/site/assets/os-detect.js?v=1';
+
+
+  mountInstallSnippet(document.getElementById('oneliner'), { noDownload: true, noLabel: true }); // the hero above owns the download and the label
+
+  // the visitor's platform, computed once: the terminal one-liner below, the
+  // CTA and the chips all key off it. os-detect.js owns the sniff and the
+  // result is still a guess, so no other platform is hidden (every chip
+  // stays). A phone or tablet gets its store as the primary, and the desktop
+  // chips stay beneath it, recaptioned: those installers belong on the
+  // computer.
+  const P = detectPlatform(); // { os, mobile, label }
+  const DESKTOP = { mac: 'macOS', windows: 'Windows', linux: 'Linux' };
+  const onDesktop = P.os in DESKTOP;
+  const cta = document.getElementById('dl-cta'), file = document.getElementById('dl-file');
+
+  // the terminal path: the visitor's shell line, from that same os. mac and
+  // linux pipe bootstrap.sh through sh; windows runs the PowerShell
+  // bootstrap. A phone (or an unrecognised UA) gets no terminal row at all —
+  // its divider hides with it, the download button and the agent paste row
+  // below are the paths there.
+  {
+    const shell = document.getElementById('dl-shell');
+    const shellOr = shell.previousElementSibling; // the "or in a terminal" divider
+    const shellCmd = P.os === 'windows'
+      ? `irm ${location.origin}/bootstrap.ps1 | iex`
+      : onDesktop
+        ? `curl -fsSL ${location.origin}/bootstrap.sh | sh`
+        : null;
+    if (shellCmd) mountCommandRow(shell, { cmd: shellCmd });
+    else { shell.hidden = true; if (shellOr) shellOr.hidden = true; }
+  }
+
+  // the download hero's primary: the visitor's own platform.
+  if (onDesktop) {
+    const chip = document.querySelector(`#dl-alts .dl-chip[data-os="${P.os}"]`);
+    let href = (chip && chip.href) || '/download';
+    if (P.os === 'mac') {
+      // the dmg is arch-pinned; when the live probe disagrees with the pinned
+      // asset, send the reader to the chooser instead of a wrong download
+      const { arch } = await detectArchEvidence('mac');
+      if (arch === 'x64') href = '/download';
+    }
+    cta.href = href; cta.dataset.os = P.os;
+    cta.querySelector('.dl-cta-label').textContent = `Download for ${DESKTOP[P.os]}`;
+    cta.querySelector('.sb-os-mark').innerHTML = osMark(P.os);
+    file.textContent = href.split('/').pop();
+  } else {
+    const link = storeLink(P.os); // ios or android only: null otherwise
+    cta.href = link || '/download';
+    cta.querySelector('.dl-cta-label').textContent = link ? storeLabel(P.os) : 'Get the desktop app';
+    cta.querySelector('.sb-os-mark').innerHTML = link ? osMark('google-play') : '';
+    file.hidden = true;
+    // the desktop chips stay, recaptioned: on a phone they are the paths for
+    // the computer, not "other platforms"
+    const alts = document.getElementById('dl-alts');
+    alts.setAttribute('aria-label', 'install on your computer');
+    alts.insertAdjacentHTML('beforebegin', '<p class="alt-cap">on your computer</p>');
+  }
+  consoleEgg({ lines: ['still here. still fixing things.'] });
+
+  // the works-anywhere line sits after the install box without JS; with JS it
+  // moves under the install box's "what does this do?" fold (owner, 2026-09-01)
+  // (the widget renders after this script runs, so wait for the fold).
+  // the widget's only remaining fold is the explanation one ("what does this
+  // do?"); the :not(.sb-alts) guard is kept in case the "other platforms"
+  // fold ever returns ahead of it (it was removed 2026-09-06)
+  const anywhere = document.getElementById('anywhere');
+  const tuck = (tries = 0) => {
+    const fold = document.querySelector('#oneliner details.sb-fold:not(.sb-alts)');
+    if (fold && anywhere) fold.append(anywhere);
+    else if (tries < 60) setTimeout(() => tuck(tries + 1), 50);
+  };
+  tuck();
+
+  // the client rail (nav.dock): a static row of marks under the stage. With
+  // motion allowed it runs in .live mode (marks only, a name opens on hover);
+  // reduced motion never adds .live, so every name stays visible and no
+  // transition fires.
+  const dockEl = document.getElementById('dock');
+  const items = [...dockEl.querySelectorAll('a')];
+  const motionOK = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // a hovered name near the rail's right end opens past its edge and under the
+  // fade; once the track has opened, nudge the rail so the whole pill shows
+  // (only the rail scrolls, for the same reason as above). Reduced motion never
+  // adds .live, so names are always open and no transition fires.
+  items.forEach((a) => a.addEventListener('transitionend', (e) => {
+    if (e.propertyName !== 'grid-template-columns' || !a.matches(':hover, :focus-visible')) return;
+    const over = Math.ceil(a.getBoundingClientRect().right + 18 - dockEl.getBoundingClientRect().right);
+    if (over > 0) dockEl.scrollBy({ left: over, behavior: motionOK ? 'smooth' : 'auto' });
+  }));
+
+  if (motionOK) dockEl.classList.add('live');
+
+  // the hero animation, picked with `?hero=<name>` (2026-09-09, variants under
+  // review): `boot` is the 32s boot-sequence story hub-boot.js self-boots in
+  // #stage (its own clock, offscreen pause, reduced-motion still, replay
+  // button); `chaos` is variant A (hero-chaos.js: skill chips and app tiles
+  // bounce like a screensaver, superbot slams in, pulls them into lists, then
+  // hands the stage to the real app); `xdxd` is variant B (hero-xdxd.js, after
+  // the cloned-xdxdxd concept). Since W6 both variants mount INSIDE #stage and
+  // hand off through the shared hub-handoff.js (prepStage, the hub reveal, the
+  // inner fades, the rebased phone beat, the perched hold); their stylesheets
+  // are linked in <head> beside hub-boot.css. No parameter, or an
+  // unknown name, plays HERO_DEFAULT: `chaos`, the ad-gallery concept the owner
+  // described in full (2026-09-09); `boot` and `xdxd` stay one parameter away.
+  const HERO_DEFAULT = 'chaos';
+  const HEROES = {
+    boot: '/site/assets/hub-boot.js?v=40',
+    chaos: '/site/assets/hero-chaos.js?v=6',
+    xdxd: '/site/assets/hero-xdxd.js?v=3',
+  };
+  const heroName = new URLSearchParams(location.search).get('hero');
+  import(HEROES[heroName] ?? HEROES[HERO_DEFAULT]);
+</script>
+</body>
+</html>
