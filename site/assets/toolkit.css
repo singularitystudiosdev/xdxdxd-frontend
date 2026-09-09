@@ -1,0 +1,142 @@
+/* toolkit.css — the operator panel for the lander's chat scene.
+   Fixed overlay, top right, above every stage layer (stage peaks at z:8). */
+
+.tk {
+  position: fixed;
+  top: 74px;
+  right: 14px;
+  z-index: 9999;
+  width: 248px;
+  font: 11px/1.45 ui-monospace, "SF Mono", Menlo, monospace;
+  color: #d7d7db;
+  background: rgba(12, 12, 14, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  user-select: none;
+}
+.tk-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  cursor: pointer;
+}
+.tk-dot { width: 7px; height: 7px; border-radius: 50%; background: #43d17c; box-shadow: 0 0 8px #43d17c88; }
+.tk-title { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 10px; color: #9a9aa2; }
+.tk-fold { margin-left: auto; color: #6f6f78; font-size: 10px; }
+.tk-body { padding: 10px 12px 12px; display: grid; gap: 10px; }
+.tk.folded .tk-body { display: none; }
+
+.tk-row { display: flex; gap: 7px; }
+.tk-btn {
+  flex: 1;
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ececf0;
+  font: 700 11px/1 ui-monospace, "SF Mono", Menlo, monospace;
+  padding: 8px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.tk-btn:hover { background: rgba(255, 255, 255, 0.12); }
+.tk-btn:active { transform: scale(0.97); }
+.tk-btn.primary {
+  background: linear-gradient(135deg, #5b8cff, #7b5bff);
+  border-color: transparent;
+  color: #fff;
+}
+.tk-btn.primary:hover { filter: brightness(1.1); }
+.tk-btn.danger:hover { border-color: #ff6b6b99; color: #ffb3b3; }
+
+.tk-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7c7c85;
+}
+.tk-group { display: grid; gap: 6px; }
+.tk-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+
+.tk select, .tk input[type="color"] {
+  appearance: none;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  color: #e6e6ea;
+  font: 11px ui-monospace, "SF Mono", Menlo, monospace;
+  padding: 5px 7px;
+}
+.tk select:focus, .tk input:focus { outline: 1px solid #5b8cff99; }
+.tk option { background: #131316; }
+
+.tk input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+}
+.tk input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #5b8cff;
+  border: 2px solid #0c0c0e;
+  box-shadow: 0 0 8px #5b8cff66;
+}
+.tk-val { float: right; color: #8f8f98; font-size: 10px; }
+.tk-cfg { display: grid; grid-template-columns: 64px 1fr 38px; align-items: center; gap: 8px; }
+.tk-cfg .tk-val { text-align: right; }
+
+.tk-check { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+.tk-check input { accent-color: #5b8cff; width: 13px; height: 13px; cursor: pointer; }
+.tk-swatches { display: flex; gap: 6px; align-items: center; }
+.tk-sw { width: 17px; height: 17px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25); cursor: pointer; padding: 0; }
+.tk-sw.sel { outline: 2px solid #5b8cff; outline-offset: 1px; }
+
+/* --- typed-character effects (engine adds .on as the clock reaches each char) --- */
+#feed .tk-ch { display: inline; opacity: 0; }
+#feed .tk-ch.on { opacity: 1; }
+#feed.tk-eff-fade .tk-ch { transition: opacity var(--tk-fade, 220ms) ease; }
+#feed.tk-eff-blur .tk-ch { transition: opacity var(--tk-fade, 220ms) ease, filter var(--tk-fade, 220ms) ease; filter: blur(5px); }
+#feed.tk-eff-blur .tk-ch.on { filter: blur(0); }
+#feed.tk-eff-slide .tk-ch { transition: opacity var(--tk-fade, 220ms) ease, transform var(--tk-fade, 220ms) cubic-bezier(0.2, 0.8, 0.2, 1); display: inline-block; transform: translateY(7px); }
+#feed.tk-eff-slide .tk-ch.on { transform: translateY(0); }
+#feed.tk-eff-scale .tk-ch { transition: opacity var(--tk-fade, 220ms) ease, transform var(--tk-fade, 220ms) cubic-bezier(0.2, 0.8, 0.2, 1); display: inline-block; transform: scale(0.75); }
+#feed.tk-eff-scale .tk-ch.on { transform: scale(1); }
+#feed.tk-eff-instant .tk-ch { transition: none; }
+#feed.tk-eff-word .tk-ch { transition: opacity var(--tk-fade, 220ms) ease; }
+/* word mode: the engine stamps chars of the same word with a shared --tk-w delay */
+
+.tk-caret {
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -0.15em;
+  background: var(--tk-accent, #5b8cff);
+  animation: tk-blink 0.9s steps(2, jump-none) infinite;
+}
+@keyframes tk-blink { to { opacity: 0; } }
+
+/* font-editor application surface: the operator edits the chat's type */
+#feed.tk-font { font-family: var(--tk-ff, inherit); }
+#feed.tk-font .msg .m-text {
+  font-family: inherit;
+  font-size: var(--tk-fs, 13px);
+  font-weight: var(--tk-fw, 400);
+  font-style: var(--tk-fst, normal);
+  letter-spacing: var(--tk-ls, 0px);
+  line-height: var(--tk-lh, 1.5);
+  color: var(--tk-col, inherit);
+}
