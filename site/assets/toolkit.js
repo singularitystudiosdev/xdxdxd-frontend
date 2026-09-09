@@ -118,12 +118,22 @@ function typeLorem() {
   const template = [...f.querySelectorAll('.msg')].pop();
   const msg = template
     ? template.cloneNode(true)
-    : h('div', { class: 'msg' }, h('div', { class: 'm-main' }, h('div', { class: 'm-text' })));
+    : h('div', { class: 'msg' });
+  if (!template) {
+    // same shape as the origin's own message markup (document-relative img)
+    msg.innerHTML = '<span class="avatar sb"><img src="site/assets/brand/mark-clean.svg" alt=""/></span>'
+      + '<div class="m-main"><div class="m-head"><span class="m-name">superbot</span>'
+      + '<span class="app">APP</span><span class="m-when"></span></div><div class="m-text"></div></div>';
+  }
   msg.removeAttribute('data-m');
   msg.querySelectorAll('.m-when').forEach(e => { e.textContent = nowLabel(); });
   const text = msg.querySelector('.m-text');
   if (!text) return;
   text.innerHTML = '';
+  // the scene's CSS starts .msg at opacity 0 and only the animation timeline
+  // reveals the two static ones; a runtime message must reveal itself.
+  msg.style.opacity = '1';
+  msg.style.animation = 'none';
   f.append(msg);
 
   const body = LOREM[Math.floor(Math.random() * LOREM.length)];
