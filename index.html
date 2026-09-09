@@ -441,9 +441,9 @@
   // described in full (2026-09-09); `boot` and `xdxd` stay one parameter away.
   const HERO_DEFAULT = 'chaos';
   const HEROES = {
-    boot: 'site/assets/hub-boot.js?v=40',
-    chaos: 'site/assets/hero-chaos.js?v=6',
-    xdxd: 'site/assets/hero-xdxd.js?v=3',
+    boot: './site/assets/hub-boot.js?v=40',
+    chaos: './site/assets/hero-chaos.js?v=6',
+    xdxd: './site/assets/hero-xdxd.js?v=3',
   };
   const heroName = new URLSearchParams(location.search).get('hero');
   import(HEROES[heroName] ?? HEROES[HERO_DEFAULT]);
