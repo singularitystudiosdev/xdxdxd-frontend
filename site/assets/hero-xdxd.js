@@ -122,7 +122,7 @@ function boot() {
   bloom.className = 'hx-bloom';
   bloom.style.cssText = 'position:absolute;left:50%;top:50%;width:' + T.MARK + 'px;height:' + T.MARK + 'px;margin:' + (-T.MARK / 2) + 'px 0 0 ' + (-T.MARK / 2) + 'px;z-index:5;opacity:0;will-change:transform,filter;border-radius:' + (T.MARK * (14 / 44)) + 'px;box-shadow:' + HAIRLINE + ';';
   const mark = new Image();
-  mark.src = '/site/assets/brand/tile.svg';
+  mark.src = 'site/assets/brand/tile.svg';
   mark.alt = '';
   mark.draggable = false;
   mark.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;';
@@ -155,7 +155,7 @@ function boot() {
     t.title = a.name || a.app;
     t.style.cssText = 'position:absolute;left:0;top:0;width:' + T.TILE + 'px;height:' + T.TILE + 'px;will-change:transform,opacity,filter;opacity:0;border-radius:' + (T.TILE * (14 / 44)) + 'px;';
     const img = IMG[a.app] ? new Image() : null;
-    if (img) { img.src = '/site/assets/brand/intro/' + IMG[a.app]; img.alt = ''; img.draggable = false; }
+    if (img) { img.src = 'site/assets/brand/intro/' + IMG[a.app]; img.alt = ''; img.draggable = false; }
     if (a.face) { t.style.background = a.bg; t.style.color = 'var(--ink)'; t.appendChild(img); }
     else if (!SYM[a.app]) { t.appendChild(img); }
     else { t.innerHTML = '<svg aria-hidden="true"><use href="#sb-ic-' + a.app + '"/></svg>'; }

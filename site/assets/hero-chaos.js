@@ -112,8 +112,8 @@ const HC = {
   BRANDS: ['claude.png', 'gemini-app-icon.png', 'cursor.png', 'copilot.svg', 'devin.png',
            'grok.png', 'hermes.png', 'kiro.png', 'replit.png', 'lovable.png',
            'jetbrains.png', 'bolt.png', 'base44.png', 'v0.svg', 'vscode.png', 'warp.png'],
-  BRAND: '/site/assets/brand/chaos/',        // local only, never external at runtime
-  SLAM_TILE: '/site/assets/brand/tile.svg',  // the slam tile, already local
+  BRAND: 'site/assets/brand/chaos/',        // local only, never external at runtime
+  SLAM_TILE: 'site/assets/brand/tile.svg',  // the slam tile, already local
 
   // cards: heading + rows (verbatim from the spec's copy list)
   CARDS: [

@@ -16,9 +16,9 @@
 // with `?v=<name>` (no param = the shipped story). They are this same story with
 // different behaviour after the reveal, so there are no forked files.
 
-import { Mascot, mascotFrame, morphFrames, VARIANTS } from '/site/assets/mascot.js?v=13';
-import { mountKeys } from '/site/assets/hub-keys.js?v=2';
-import { CUTS, cutByName } from '/site/assets/hub-boot-cuts.js?v=7';
+import { Mascot, mascotFrame, morphFrames, VARIANTS } from './mascot.js?v=13';
+import { mountKeys } from './hub-keys.js?v=2';
+import { CUTS, cutByName } from './hub-boot-cuts.js?v=7';
 
 const $ = (id) => document.getElementById(id);
 const stage = $('stage'), arena = $('arena'), margin = $('margin'), mascotEl = $('mascot');
@@ -293,7 +293,7 @@ const tourEls = TOUR.map((m) => {
   const av = m.own
     ? '<span class="avatar" style="--c:#fb7185">Y</span>'
     : (m.who === 'superbot'
-      ? '<span class="avatar sb"><img src="/site/assets/brand/mark-clean.svg" alt=""></span>'
+      ? '<span class="avatar sb"><img src="site/assets/brand/mark-clean.svg" alt=""></span>'
       : `<span class="avatar sb">${m.who.slice(0, 2)}</span>`);
   const body = (m.text ? `<div class="m-text">${m.text}</div>` : '') +
     (m.code ? `<div class="card code${m.better ? ' better' : ''}"><div class="c-bar"><span class="cap">${m.file}</span></div><pre>${sql(m.code)}</pre></div>` : '');

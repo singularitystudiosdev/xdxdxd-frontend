@@ -1,5 +1,5 @@
 // Install snippet with OS detection. Shared by the landers:
-//   import { mountInstallSnippet } from '/site/assets/install-snippet.js?v=32';
+//   import { mountInstallSnippet } from './install-snippet.js?v=32';
 //   mountInstallSnippet(document.getElementById('oneliner'));
 // There is no installer anymore: the MCP server is hosted on the origin and
 // the desktop app (linked from /download) wires every AI client on the
@@ -13,7 +13,7 @@
 // Fires `superbot:copied` on window with { source } after a copy that
 // actually happened (the mascot celebrates; /docs advances its step rail).
 
-import { detectPlatform } from '/site/assets/os-detect.js?v=1';
+import { detectPlatform } from './os-detect.js?v=1';
 
 // The desktop OS for the widget's own purposes, mapped off the one shared
 // ladder (os-detect.js, also behind download.html, the header's nav-store.js
