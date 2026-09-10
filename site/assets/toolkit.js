@@ -239,8 +239,23 @@ const SWATCHES = [
   ['#ffffff', 'white'],
 ];
 
+// response indicator — how the "superbot" marker reads while a reply is
+// being typed (tk-responding, set below): icon = the mark to the left
+// (shipped default), text = the word "superbot" to the left instead, both =
+// icon + word together, none = no marker at all, the bubble carries it alone.
+const RESP_STYLES = [
+  ['icon', 'icon left'],
+  ['text', '"superbot" text left'],
+  ['both', 'icon + text left'],
+  ['none', 'no marker'],
+];
+const RESP_CLASSES = RESP_STYLES.map(([id]) => 'tk-resp-' + id);
+
 const settings = Object.assign(
-  { font: FONTS_SYSTEM[0][1], size: 13, weight: 400, italic: false, spacing: 0, lineHeight: 1.5, color: '', effect: 'fade', msPerChar: 26, fadeMs: 220, bold: false, recent: [] },
+  {
+    font: FONTS_SYSTEM[0][1], size: 13, weight: 400, italic: false, spacing: 0, lineHeight: 1.5, color: '', effect: 'fade', msPerChar: 26, fadeMs: 220, bold: false, recent: [],
+    respStyle: 'icon', respSize: 26, respX: 0, respY: 0,
+  },
   JSON.parse(localStorage.getItem(STORE) || '{}'),
 );
 
@@ -283,6 +298,18 @@ function applyEffectClass() {
   f.style.setProperty('--tk-fade', settings.fadeMs + 'ms');
 }
 
+// response indicator: only the icon/text marker on a message that is
+// currently being typed (.msg.tk-responding) is affected — see typeLorem().
+function applyResponse() {
+  const f = feed();
+  if (!f) return;
+  f.classList.remove(...RESP_CLASSES);
+  f.classList.add('tk-resp-' + settings.respStyle);
+  f.style.setProperty('--tk-resp-size', settings.respSize + 'px');
+  f.style.setProperty('--tk-resp-x', settings.respX + 'px');
+  f.style.setProperty('--tk-resp-y', settings.respY + 'px');
+}
+
 function stopTyping() {
   if (!typing) return;
   clearTimeout(typing.timer);
@@ -299,6 +326,7 @@ function typeLorem() {
   stopTyping();
   applyFont();
   applyEffectClass();
+  applyResponse();
 
   const template = [...f.querySelectorAll('.msg')].pop();
   const msg = template
@@ -311,6 +339,7 @@ function typeLorem() {
       + '<span class="app">APP</span><span class="m-when"></span></div><div class="m-text"></div></div>';
   }
   msg.removeAttribute('data-m');
+  msg.classList.remove('tk-responding');
   msg.querySelectorAll('.m-when').forEach(e => { e.textContent = nowLabel(); });
   const text = msg.querySelector('.m-text');
   if (!text) return;
@@ -319,6 +348,10 @@ function typeLorem() {
   // reveals the two static ones; a runtime message must reveal itself.
   msg.style.opacity = '1';
   msg.style.animation = 'none';
+  // "responding": the icon/text marker variant (applyResponse above) only
+  // applies for as long as this class is on the row — cleared once the
+  // typing run finishes below, same as a real "is typing…" state would be.
+  msg.classList.add('tk-responding');
   f.append(msg);
 
   // alternate short / long on every press, starting short
@@ -354,6 +387,7 @@ function typeLorem() {
   }));
   typing = {
     timer: setTimeout(() => {
+      msg.classList.remove('tk-responding');
       typing = null;
     }, Math.max(body.length * settings.msPerChar + settings.fadeMs + 120, 400)),
   };
@@ -614,6 +648,7 @@ function buildPanel() {
       val.textContent = input.value + (unit || '');
       if (key === 'msPerChar') { /* engine reads it per run */ }
       applyFont();
+      applyResponse();
       save();
     } });
     return h('div', { class: 'tk-cfg' }, h('span', { class: 'tk-label' }, label), input, val);
@@ -643,6 +678,24 @@ function buildPanel() {
   const effSel = h('select', { onchange: () => { settings.effect = effSel.value; applyEffectClass(); save(); } },
     ...EFFECTS.map(([id, name]) => h('option', { value: id }, name)));
   effSel.value = settings.effect;
+
+  // response indicator: which marker leads a message while it is being
+  // typed (.msg.tk-responding, see typeLorem()) — icon, "superbot" text,
+  // both together, or none at all
+  const respBtns = [];
+  const selectResp = (id, btn) => {
+    settings.respStyle = id;
+    respBtns.forEach(b => b.classList.toggle('sel', b === btn));
+    applyResponse();
+    save();
+  };
+  for (const [id, name] of RESP_STYLES) {
+    respBtns.push(h('button', {
+      class: 'tk-fp' + (settings.respStyle === id ? ' sel' : ''),
+      'data-tk': 'resp',
+      onclick: e => selectResp(id, e.currentTarget),
+    }, name));
+  }
 
   // weight shelf: 100-900 as pills; the bold checkbox stays as an alias for 700
   const weightPills = [100, 200, 300, 400, 500, 600, 700, 800, 900].map(w => {
@@ -698,6 +751,14 @@ function buildPanel() {
         effSel,
         slider('msPerChar', 'type speed', 6, 160, 1, 'ms/ch'),
         slider('fadeMs', 'fade time', 60, 1000, 10, 'ms')),
+      // response: the icon/text marker on a message while it's being typed —
+      // "responding" — only. Settled messages keep the shipped layout.
+      h('div', { class: 'tk-group' },
+        h('span', { class: 'tk-label' }, 'response (while typing)'),
+        h('div', { class: 'tk-row' }, ...respBtns),
+        slider('respSize', 'icon size', 14, 44, 1, 'px'),
+        slider('respX', 'icon x', -20, 40, 1, 'px'),
+        slider('respY', 'icon y', -20, 20, 1, 'px')),
       h('div', { class: 'tk-group' },
         h('span', { class: 'tk-label' }, 'font'),
         h('div', { class: 'tk-fonts', 'data-tk': 'fonts' }, ...fontPills),
@@ -722,6 +783,7 @@ function mount() {
   document.body.append(buildPanel());
   applyFont();
   applyEffectClass();
+  applyResponse();
 }
 
 mount();

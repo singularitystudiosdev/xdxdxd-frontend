@@ -179,3 +179,61 @@
   line-height: var(--tk-lh, 1.5);
   color: var(--tk-col, inherit);
 }
+
+/* --- response indicator: the marker on a message while it's actively being
+   typed (.msg.tk-responding, toggled by toolkit.js typeLorem() for the
+   run's duration only — a settled message reverts to the shipped layout).
+   icon keeps the mark, resized/nudged by the size+x+y sliders; text swaps
+   it for the word "superbot"; both shows the mark plus the word beside it;
+   none drops the marker and leaves the bubble alone. All four stay left of
+   the bubble, only the marker itself changes. --- */
+#feed .msg.tk-responding .avatar.sb {
+  width: var(--tk-resp-size, 26px);
+  height: var(--tk-resp-size, 26px);
+  transform: translate(var(--tk-resp-x, 0px), var(--tk-resp-y, 0px));
+  transition: width 0.15s ease, height 0.15s ease, transform 0.15s ease;
+}
+#feed .msg.tk-responding .avatar.sb img { width: 100%; height: 100%; object-fit: contain; }
+
+#feed.tk-resp-text .msg.tk-responding .avatar.sb {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  font: 700 calc(var(--tk-resp-size, 26px) * 0.46) / 1 ui-monospace, "SF Mono", Menlo, monospace;
+  color: #e6e6ea;
+  white-space: nowrap;
+}
+#feed.tk-resp-text .msg.tk-responding .avatar.sb img { display: none; }
+#feed.tk-resp-text .msg.tk-responding .avatar.sb::before { content: 'superbot'; }
+
+#feed.tk-resp-both .msg.tk-responding .avatar.sb {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#feed.tk-resp-both .msg.tk-responding .avatar.sb img {
+  width: var(--tk-resp-size, 26px);
+  height: var(--tk-resp-size, 26px);
+}
+#feed.tk-resp-both .msg.tk-responding .avatar.sb::after {
+  content: 'superbot';
+  font: 700 calc(var(--tk-resp-size, 26px) * 0.42) / 1 ui-monospace, "SF Mono", Menlo, monospace;
+  color: #e6e6ea;
+  white-space: nowrap;
+}
+
+#feed.tk-resp-none .msg.tk-responding .avatar.sb {
+  width: 0;
+  height: 0;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  opacity: 0;
+}
