@@ -94,6 +94,8 @@
   font-weight: 700;
   box-shadow: 0 2px 12px rgba(126, 84, 247, 0.45);
 }
+.tk-weights { max-height: none; }
+.tk-weights .tk-fp { font-family: inherit; font-size: 10px; padding: 5px 9px; }
 .tk select, .tk input[type="color"] {
   appearance: none;
   width: 100%;
@@ -148,17 +150,6 @@
 #feed.tk-eff-instant .tk-ch { transition: none; }
 #feed.tk-eff-word .tk-ch { transition: opacity var(--tk-fade, 220ms) ease; }
 /* word mode: the engine stamps chars of the same word with a shared --tk-w delay */
-
-.tk-caret {
-  display: inline-block;
-  width: 7px;
-  height: 1em;
-  margin-left: 1px;
-  vertical-align: -0.15em;
-  background: var(--tk-accent, #5b8cff);
-  animation: tk-blink 0.9s steps(2, jump-none) infinite;
-}
-@keyframes tk-blink { to { opacity: 0; } }
 
 /* font-editor application surface: the operator edits the chat's type */
 #feed.tk-font { font-family: var(--tk-ff, inherit); }

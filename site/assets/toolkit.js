@@ -7,19 +7,20 @@ const STORE = 'tk-settings-v1';
 
 // One batched Google Fonts request covers every (web) entry; injected on mount,
 // display=swap so text never blocks. Stock faces below need nothing.
-const WEB_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800'
-  + '&family=Space+Grotesk:wght@400;500;600;700'
-  + '&family=Archivo:wght@400;500;600;700;800'
-  + '&family=Manrope:wght@400;500;600;700;800'
-  + '&family=Oswald:wght@400;500;600;700'
-  + '&family=Barlow+Condensed:wght@400;500;600;700;800'
-  + '&family=Roboto+Condensed:wght@400;500;600;700;800&display=swap';
+const WEB_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600;700;800;900'
+  + '&family=Space+Grotesk:wght@300;400;500;600;700'
+  + '&family=Archivo:wght@100;200;300;400;500;600;700;800;900'
+  + '&family=Manrope:wght@200;300;400;500;600;700;800'
+  + '&family=Oswald:wght@200;300;400;500;600;700'
+  + '&family=Barlow+Condensed:wght@100;200;300;400;500;600;700;800;900'
+  + '&family=Roboto+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap';
 
 const FONTS = [
   ['System UI (this OS)', '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif'],
   ['SF Pro Rounded (Ask Superbot)', '"SF Pro Rounded", "SF Pro Display", -apple-system, system-ui, sans-serif'],
   ['SF Pro Display', '"SF Pro Display", -apple-system, sans-serif'],
   ['SF Pro Text', '"SF Pro Text", -apple-system, sans-serif'],
+  ['superbot.gg wordmark', '"SF Pro Rounded", "SF Pro Display", -apple-system, system-ui, sans-serif'],
   ['SF Mono (page mono)', 'ui-monospace, "SF Mono", Menlo, monospace'],
   ['Menlo', 'Menlo, "Bitstream Vera Sans Mono", monospace'],
   ['Courier New', '"Courier New", Courier, monospace'],
@@ -135,7 +136,6 @@ function applyEffectClass() {
 function stopTyping() {
   if (!typing) return;
   clearTimeout(typing.timer);
-  typing.caret?.remove();
   typing = null;
 }
 
@@ -194,23 +194,16 @@ function typeLorem() {
       chars.push(span);
     }
   }
-  const caret = h('span', { class: 'tk-caret' });
-  text.append(caret);
   if (f.scrollTop !== undefined) f.scrollTop = f.scrollHeight;
 
-  // one class flip on the feed runs every char's transition on its own delay;
-  // the clock only schedules the caret removal at the very end.
-  const total = body.length * settings.msPerChar + settings.fadeMs + 120;
+  // one class flip on the feed runs every char's transition on its own delay.
   requestAnimationFrame(() => requestAnimationFrame(() => {
     for (const c of chars) c.classList.add('on');
   }));
   typing = {
-    caret,
-    done: false,
     timer: setTimeout(() => {
-      caret.remove();
       typing = null;
-    }, Math.max(total, 400)),
+    }, Math.max(body.length * settings.msPerChar + settings.fadeMs + 120, 400)),
   };
 }
 
@@ -254,9 +247,22 @@ function buildPanel() {
     ...EFFECTS.map(([id, name]) => h('option', { value: id }, name)));
   effSel.value = settings.effect;
 
-  const weightSel = h('select', { onchange: () => { settings.weight = Number(weightSel.value); settings.bold = settings.weight === 700; boldBox.checked = settings.bold; applyFont(); save(); } },
-    ...[400, 500, 600, 700].map(w => h('option', { value: w }, w)));
-  weightSel.value = String(settings.bold ? 700 : settings.weight);
+  // weight shelf: 100-900 as pills; the bold checkbox stays as an alias for 700
+  const weightPills = [100, 200, 300, 400, 500, 600, 700, 800, 900].map(w => {
+    const b = h('button', {
+      class: 'tk-fp tk-w' + ((settings.bold ? 700 : settings.weight) === w ? ' sel' : ''),
+      'data-tk': 'weight',
+      onclick: () => {
+        settings.weight = w;
+        settings.bold = w === 700;
+        boldBox.checked = settings.bold;
+        weightPills.forEach(x => x.classList.toggle('sel', x === b));
+        applyFont();
+        save();
+      },
+    }, String(w));
+    return b;
+  });
 
   const boldBox = h('input', { type: 'checkbox', onchange: () => { settings.bold = boldBox.checked; if (settings.bold) weightSel.value = '700'; applyFont(); save(); } });
   boldBox.checked = settings.bold;
@@ -297,8 +303,10 @@ function buildPanel() {
         slider('size', 'size', 10, 22, 0.5, 'px'),
         slider('spacing', 'letterspacing', -0.5, 4, 0.1, 'px'),
         slider('lineHeight', 'line height', 1.1, 2, 0.05, ''),
+        h('div', { class: 'tk-group' },
+          h('span', { class: 'tk-label' }, 'weight'),
+          h('div', { class: 'tk-fonts tk-weights' }, ...weightPills)),
         h('div', { class: 'tk-grid2' },
-          h('div', { class: 'tk-group' }, h('span', { class: 'tk-label' }, 'weight'), weightSel),
           h('div', { class: 'tk-group' }, h('span', { class: 'tk-label' }, 'color'), colorInput)),
         h('div', { class: 'tk-row' },
           h('label', { class: 'tk-check' }, boldBox, 'bold'),
