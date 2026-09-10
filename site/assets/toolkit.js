@@ -424,12 +424,6 @@ function toggleRecording(e) {
 // they pass in a plain headless one. Drawing the shot ourselves with Canvas
 // 2D sidesteps that entirely: no cloning, no layout dependency, same pixels
 // in every browser and every animation state.
-const SHOT_LENGTHS = [
-  ['short', 'sure. syncing now.'],
-  ['medium', 'nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos.'],
-  ['long', LOREM[0] + ' ' + LOREM[1]],
-  ['xlong', LOREM[0] + ' ' + LOREM[2] + ' ' + LOREM[4] + ' ' + LOREM[5]],
-];
 
 // the four faces from the reference screenshots - seeded so a first press
 // (before four distinct pills have been picked) still produces four shots.
@@ -469,7 +463,7 @@ if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D
   CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, hh, r) { this.rect(x, y, w, hh); };
 }
 
-function drawShot({ stack, weight, italic, color, size, lineHeight, text, caption }) {
+function drawShot({ stack, weight, italic, color, size, lineHeight, shortText, longText, caption }) {
   const W = 760, H = 640, DPR = 2;
   const canvas = document.createElement('canvas');
   canvas.width = W * DPR;
@@ -501,44 +495,51 @@ function drawShot({ stack, weight, italic, color, size, lineHeight, text, captio
   ctx.font = '400 12px -apple-system, system-ui, sans-serif';
   ctx.fillText('This is the start of your conversation with Superbot.', 56, 108);
 
-  // avatar circle for the message
-  ctx.fillStyle = '#1a1a1c';
-  ctx.beginPath(); ctx.arc(36, 152, 18, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = '700 13px -apple-system, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('sb', 36, 157);
-  ctx.textAlign = 'left';
+  // one chat message: avatar, name/APP/time row, wrapped body. Returns the
+  // y the next message may start at.
+  const drawMsg = (y0, body, time) => {
+    const headY = y0 + 12;
+    ctx.fillStyle = '#1a1a1c';
+    ctx.beginPath(); ctx.arc(36, headY + 5, 18, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '700 13px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('sb', 36, headY + 10);
+    ctx.textAlign = 'left';
 
-  // name / APP badge / timestamp
-  ctx.fillStyle = '#f2f2f4';
-  ctx.font = '700 13px -apple-system, system-ui, sans-serif';
-  ctx.fillText('superbot', 56, 148);
-  const nameW = ctx.measureText('superbot').width;
-  ctx.fillStyle = '#2f6bff';
-  const badgeX = 56 + nameW + 10, badgeW = 34;
-  ctx.beginPath();
-  ctx.roundRect(badgeX, 136, badgeW, 16, 5);
-  ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = '700 9px -apple-system, sans-serif';
-  ctx.fillText('APP', badgeX + 6, 147);
-  ctx.fillStyle = '#8a8a92';
-  ctx.font = '400 11px -apple-system, sans-serif';
-  ctx.fillText(nowLabel(), badgeX + badgeW + 10, 147);
+    ctx.fillStyle = '#f2f2f4';
+    ctx.font = '700 13px -apple-system, system-ui, sans-serif';
+    ctx.fillText('superbot', 56, headY);
+    const nameW = ctx.measureText('superbot').width;
+    ctx.fillStyle = '#2f6bff';
+    const badgeX = 56 + nameW + 10, badgeW = 34;
+    ctx.beginPath();
+    ctx.roundRect(badgeX, headY - 12, badgeW, 16, 5);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '700 9px -apple-system, sans-serif';
+    ctx.fillText('APP', badgeX + 6, headY - 1);
+    ctx.fillStyle = '#8a8a92';
+    ctx.font = '400 11px -apple-system, sans-serif';
+    ctx.fillText(time, badgeX + badgeW + 10, headY - 1);
 
-  // the message itself, in the shot's font/weight/style/color
-  const styleStr = `${italic ? 'italic ' : ''}${weight} ${size}px ${family}`;
-  ctx.font = styleStr;
-  ctx.fillStyle = fg;
-  const lines = wrapLines(ctx, text, W - 76);
-  let y = 178;
-  const lh = size * lineHeight;
-  for (const line of lines) {
-    if (y > H - 90) { ctx.fillText('…', 56, y); break; }
-    ctx.fillText(line, 56, y);
-    y += lh;
-  }
+    // the message itself, in the shot's font/weight/style/color
+    ctx.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${family}`;
+    ctx.fillStyle = fg;
+    const lines = wrapLines(ctx, body, W - 76);
+    let y = headY + 30;
+    const lh = size * lineHeight;
+    for (const line of lines) {
+      if (y > H - 90) { ctx.fillText('…', 56, y); return H - 90; }
+      ctx.fillText(line, 56, y);
+      y += lh;
+    }
+    return y;
+  };
+
+  const [t1, t2] = [nowLabel(), nowLabel()];
+  const yAfter = drawMsg(140, shortText, t1);
+  drawMsg(Math.max(yAfter + 14, 210), longText, t2);
 
   // composer bar
   ctx.fillStyle = 'rgba(255,255,255,0.06)';
@@ -573,17 +574,18 @@ async function screenshotAll(btn) {
     for (let i = 0; i < targets.length; i++) {
       const stack = targets[i];
       const label = fontLabelOf(stack);
-      const [lenTag, text] = SHOT_LENGTHS[i % SHOT_LENGTHS.length];
+      const shortText = LOREM_SHORT[i % LOREM_SHORT.length];
+      const longText = LOREM_LONG[i % LOREM_LONG.length];
       // load the exact face+weight before drawing, else canvas falls back silently
       const first = stack.split(',')[0].replace(/["']/g, '').trim();
       if (first && !first.startsWith('-apple') && !first.startsWith('ui-')) {
-        try { await document.fonts.load(`${weight} 16px "${first}"`, text); } catch { /* best effort, falls back to system */ }
+        try { await document.fonts.load(`${weight} 16px "${first}"`, longText); } catch { /* best effort, falls back to system */ }
       }
       await document.fonts.ready;
       btn.textContent = `saving ${i + 1}/${targets.length}`;
       const canvas = drawShot({
         stack, weight, italic: settings.italic, color: settings.color, size: settings.size,
-        lineHeight: settings.lineHeight, text, caption: `${label} · weight ${weight} · ${lenTag}`,
+        lineHeight: settings.lineHeight, shortText, longText, caption: `${label} · weight ${weight} · short + long`,
       });
       const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
       const a = document.createElement('a');
