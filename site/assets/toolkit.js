@@ -223,7 +223,7 @@ const SWATCHES = [
 ];
 
 const settings = Object.assign(
-  { font: FONTS[0][1], size: 13, weight: 400, italic: false, spacing: 0, lineHeight: 1.5, color: '', effect: 'fade', msPerChar: 26, fadeMs: 220, bold: false },
+  { font: FONTS_SYSTEM[0][1], size: 13, weight: 400, italic: false, spacing: 0, lineHeight: 1.5, color: '', effect: 'fade', msPerChar: 26, fadeMs: 220, bold: false },
   JSON.parse(localStorage.getItem(STORE) || '{}'),
 );
 
