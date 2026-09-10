@@ -213,6 +213,23 @@ const LOREM = [
   'at vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum.',
 ];
 
+// Chat alternates a short quick-ack and a full multi-sentence reply, so two
+// presses in a row visibly differ in length rather than drawing similarly
+// sized lines from one pool.
+const LOREM_SHORT = [
+  'sure. syncing now.',
+  'got it.',
+  'one sec.',
+  'done.',
+  'on it.',
+  'synced.',
+];
+const LOREM_LONG = [
+  LOREM[0] + ' ' + LOREM[1] + ' ' + LOREM[2],
+  LOREM[3] + ' ' + LOREM[4] + ' ' + LOREM[5],
+  LOREM[1] + ' ' + LOREM[3] + ' ' + LOREM[5] + ' ' + LOREM[0],
+];
+
 const SWATCHES = [
   ['#e6e6ea', 'default'],
   ['#5b8cff', 'accent'],
@@ -228,6 +245,7 @@ const settings = Object.assign(
 );
 
 let typing = null; // { timer, caret, done }
+let chatTurn = 0; // alternates LOREM_SHORT / LOREM_LONG each Chat press
 
 function h(tag, attrs = {}, ...kids) {
   const el = document.createElement(tag);
@@ -303,7 +321,9 @@ function typeLorem() {
   msg.style.animation = 'none';
   f.append(msg);
 
-  const body = LOREM[Math.floor(Math.random() * LOREM.length)];
+  // alternate short / long on every press, starting short
+  const pool = (chatTurn++ % 2 === 0) ? LOREM_SHORT : LOREM_LONG;
+  const body = pool[Math.floor(Math.random() * pool.length)];
   const eff = settings.effect;
   const chars = [];
   if (eff === 'word') {
