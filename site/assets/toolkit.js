@@ -398,12 +398,26 @@ function toggleRecording(e) {
   else startRecording(btn).catch(() => { btn.textContent = 'Record chat'; btn.classList.remove('recording'); });
 }
 
-// --- screenshot all: one PNG per recent font, caption burned at the bottom ---
+// --- screenshot all: one PNG per recent font, drawn natively on canvas -----
+// DOM-clone rasterizers (html2canvas et al.) break inside the lander's
+// CSS-scaled/transformed stage - they read blank in a real window even when
+// they pass in a plain headless one. Drawing the shot ourselves with Canvas
+// 2D sidesteps that entirely: no cloning, no layout dependency, same pixels
+// in every browser and every animation state.
 const SHOT_LENGTHS = [
   ['short', 'sure. syncing now.'],
   ['medium', 'nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos.'],
   ['long', LOREM[0] + ' ' + LOREM[1]],
   ['xlong', LOREM[0] + ' ' + LOREM[2] + ' ' + LOREM[4] + ' ' + LOREM[5]],
+];
+
+// the four faces from the reference screenshots - seeded so a first press
+// (before four distinct pills have been picked) still produces four shots.
+const SHOT_SEED_FONTS = [
+  '"SF Pro Rounded", "SF Pro Display", -apple-system, system-ui, sans-serif',
+  '"IBM Plex Sans", Helvetica, sans-serif',
+  'Arial, Helvetica, sans-serif',
+  'Menlo, "Bitstream Vera Sans Mono", monospace',
 ];
 
 function fontLabelOf(stack) {
@@ -416,55 +430,141 @@ function fontLabelOf(stack) {
 
 function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
 
+function wrapLines(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+  for (const w of words) {
+    const test = line ? line + ' ' + w : w;
+    if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+// CanvasRenderingContext2D.roundRect shipped Chrome 99 / Safari 16 (2022);
+// a plain rect on anything older is a harmless cosmetic downgrade, not a break.
+if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, hh, r) { this.rect(x, y, w, hh); };
+}
+
+function drawShot({ stack, weight, italic, color, size, lineHeight, text, caption }) {
+  const W = 760, H = 640, DPR = 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(DPR, DPR);
+
+  const first = stack.split(',')[0].replace(/["']/g, '').trim();
+  const family = `"${first}", ${stack.split(',').slice(1).join(',') || 'sans-serif'}`;
+  const fg = color || '#e6e6ea';
+
+  // panel background
+  ctx.fillStyle = '#0c0c0e';
+  ctx.fillRect(0, 0, W, H);
+
+  // chat header
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillRect(0, 56, W, 1);
+  ctx.fillStyle = '#f2f2f4';
+  ctx.font = '700 15px -apple-system, system-ui, sans-serif';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('chat', 20, 34);
+
+  // welcome block
+  ctx.fillStyle = '#f2f2f4';
+  ctx.font = '700 13px -apple-system, system-ui, sans-serif';
+  ctx.fillText('Welcome to #chat', 56, 90);
+  ctx.fillStyle = '#8a8a92';
+  ctx.font = '400 12px -apple-system, system-ui, sans-serif';
+  ctx.fillText('This is the start of your conversation with Superbot.', 56, 108);
+
+  // avatar circle for the message
+  ctx.fillStyle = '#1a1a1c';
+  ctx.beginPath(); ctx.arc(36, 152, 18, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 13px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('sb', 36, 157);
+  ctx.textAlign = 'left';
+
+  // name / APP badge / timestamp
+  ctx.fillStyle = '#f2f2f4';
+  ctx.font = '700 13px -apple-system, system-ui, sans-serif';
+  ctx.fillText('superbot', 56, 148);
+  const nameW = ctx.measureText('superbot').width;
+  ctx.fillStyle = '#2f6bff';
+  const badgeX = 56 + nameW + 10, badgeW = 34;
+  ctx.beginPath();
+  ctx.roundRect(badgeX, 136, badgeW, 16, 5);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 9px -apple-system, sans-serif';
+  ctx.fillText('APP', badgeX + 6, 147);
+  ctx.fillStyle = '#8a8a92';
+  ctx.font = '400 11px -apple-system, sans-serif';
+  ctx.fillText(nowLabel(), badgeX + badgeW + 10, 147);
+
+  // the message itself, in the shot's font/weight/style/color
+  const styleStr = `${italic ? 'italic ' : ''}${weight} ${size}px ${family}`;
+  ctx.font = styleStr;
+  ctx.fillStyle = fg;
+  const lines = wrapLines(ctx, text, W - 76);
+  let y = 178;
+  const lh = size * lineHeight;
+  for (const line of lines) {
+    if (y > H - 90) { ctx.fillText('…', 56, y); break; }
+    ctx.fillText(line, 56, y);
+    y += lh;
+  }
+
+  // composer bar
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.beginPath();
+  ctx.roundRect(20, H - 70, W - 40, 40, 20);
+  ctx.fill();
+  ctx.fillStyle = '#6f6f78';
+  ctx.font = '400 13px -apple-system, sans-serif';
+  ctx.fillText('How can superbot help you today?', 44, H - 45);
+
+  // caption bar
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillRect(0, H - 20, W, 1);
+  ctx.fillStyle = '#9a9aa2';
+  ctx.font = '700 11px ui-monospace, "SF Mono", Menlo, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(caption, W / 2, H - 6);
+  ctx.textAlign = 'left';
+
+  return canvas;
+}
+
 async function screenshotAll(btn) {
-  const targets = ((settings.recent || []).length ? settings.recent : [settings.font]).slice(0, 4);
-  const orig = { font: settings.font, weight: settings.weight, bold: settings.bold, spacing: settings.spacing };
+  let targets = (settings.recent || []).slice(0, 4);
+  if (targets.length < 4) {
+    for (const f of SHOT_SEED_FONTS) { if (!targets.includes(f) && targets.length < 4) targets.push(f); }
+  }
+  const weight = settings.bold ? 700 : settings.weight;
   const origText = btn.textContent;
   btn.disabled = true;
-  if (!window.html2canvas) {
-    await new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = 'site/assets/html2canvas.min.js';
-      s.onload = res; s.onerror = rej;
-      document.head.append(s);
-    }).catch(() => {});
-  }
-  if (!window.html2canvas) { btn.textContent = 'rasterizer failed'; setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 2000); return; }
-
-  const panel = document.querySelector('.main.inner');
-  const cap = h('div', { class: 'tk-cap' });
-  panel.append(cap);
-  const weight = orig.bold ? 700 : orig.weight;
-  // html2canvas mis-measures text with non-zero letter-spacing; shots are
-  // taken at 0 and the operator's spacing is restored after.
-  settings.spacing = 0;
   try {
     for (let i = 0; i < targets.length; i++) {
       const stack = targets[i];
-      settings.font = stack;
-      applyFont();
-      // fresh thread with one instant message of this shot's length
-      clearChat();
-      const f = feed();
-      const msg = h('div', { class: 'msg', style: 'opacity:1;animation:none;' });
-      msg.innerHTML = '<span class="avatar sb"><img src="site/assets/brand/mark-clean.svg" alt=""/></span>'
-        + '<div class="m-main"><div class="m-head"><span class="m-name">superbot</span><span class="app">APP</span>'
-        + `<span class="m-when">${nowLabel()}</span></div><div class="m-text"></div></div>`;
-      msg.querySelector('.app').style.cssText = 'background:#2f6bff;color:#fff;font-weight:700;border-radius:5px;padding:1px 5px;font-size:9px;';
-      const [lenTag, text] = SHOT_LENGTHS[i % SHOT_LENGTHS.length];
-      msg.querySelector('.m-text').textContent = text;
-      f.append(msg);
       const label = fontLabelOf(stack);
-      cap.textContent = `${label} · weight ${weight} · ${lenTag}`;
-      // force the exact face at the exact weight to load before rasterizing
+      const [lenTag, text] = SHOT_LENGTHS[i % SHOT_LENGTHS.length];
+      // load the exact face+weight before drawing, else canvas falls back silently
       const first = stack.split(',')[0].replace(/["']/g, '').trim();
       if (first && !first.startsWith('-apple') && !first.startsWith('ui-')) {
-        try { await document.fonts.load(`${weight} 16px "${first}"`, text); } catch { /* best effort */ }
+        try { await document.fonts.load(`${weight} 16px "${first}"`, text); } catch { /* best effort, falls back to system */ }
       }
       await document.fonts.ready;
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       btn.textContent = `saving ${i + 1}/${targets.length}`;
-      const canvas = await window.html2canvas(panel, { scale: 2, backgroundColor: '#0c0c0e', logging: false, useCORS: true });
+      const canvas = drawShot({
+        stack, weight, italic: settings.italic, color: settings.color, size: settings.size,
+        lineHeight: settings.lineHeight, text, caption: `${label} · weight ${weight} · ${lenTag}`,
+      });
       const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -473,16 +573,12 @@ async function screenshotAll(btn) {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
-      // Chrome gates the 2nd+ automatic download behind ONE "allow multiple
+      // Chrome gates the 2nd+ automatic download behind one "allow multiple
       // downloads" prompt (Allow once and every shot lands); spacing the
-      // clicks keeps each save its own file.
-      await new Promise(r => setTimeout(r, 700));
+      // clicks keeps each save its own file rather than getting coalesced.
+      await new Promise(r => setTimeout(r, 500));
     }
   } finally {
-    cap.remove();
-    Object.assign(settings, orig);
-    applyFont();
-    save();
     btn.textContent = origText;
     btn.disabled = false;
   }
