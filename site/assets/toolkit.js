@@ -223,7 +223,7 @@ const SWATCHES = [
 ];
 
 const settings = Object.assign(
-  { font: FONTS_SYSTEM[0][1], size: 13, weight: 400, italic: false, spacing: 0, lineHeight: 1.5, color: '', effect: 'fade', msPerChar: 26, fadeMs: 220, bold: false },
+  { font: FONTS_SYSTEM[0][1], size: 13, weight: 400, italic: false, spacing: 0, lineHeight: 1.5, color: '', effect: 'fade', msPerChar: 26, fadeMs: 220, bold: false, recent: [] },
   JSON.parse(localStorage.getItem(STORE) || '{}'),
 );
 
@@ -398,6 +398,87 @@ function toggleRecording(e) {
   else startRecording(btn).catch(() => { btn.textContent = 'Record chat'; btn.classList.remove('recording'); });
 }
 
+// --- screenshot all: one PNG per recent font, caption burned at the bottom ---
+const SHOT_LENGTHS = [
+  ['short', 'sure. syncing now.'],
+  ['medium', 'nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos.'],
+  ['long', LOREM[0] + ' ' + LOREM[1]],
+  ['xlong', LOREM[0] + ' ' + LOREM[2] + ' ' + LOREM[4] + ' ' + LOREM[5]],
+];
+
+function fontLabelOf(stack) {
+  for (const [, fonts] of FONT_GROUPS) {
+    const hit = fonts.find(([, s]) => s === stack);
+    if (hit) return hit[0];
+  }
+  return 'custom';
+}
+
+function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
+
+async function screenshotAll(btn) {
+  const targets = ((settings.recent || []).length ? settings.recent : [settings.font]).slice(0, 4);
+  const orig = { font: settings.font, weight: settings.weight, bold: settings.bold };
+  const origText = btn.textContent;
+  btn.disabled = true;
+  if (!window.html2canvas) {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'site/assets/html2canvas.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.append(s);
+    }).catch(() => {});
+  }
+  if (!window.html2canvas) { btn.textContent = 'rasterizer failed'; setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 2000); return; }
+
+  const panel = document.querySelector('.main.inner');
+  const cap = h('div', { class: 'tk-cap' });
+  panel.append(cap);
+  const weight = orig.bold ? 700 : orig.weight;
+  try {
+    for (let i = 0; i < targets.length; i++) {
+      const stack = targets[i];
+      settings.font = stack;
+      applyFont();
+      // fresh thread with one instant message of this shot's length
+      clearChat();
+      const f = feed();
+      const msg = h('div', { class: 'msg', style: 'opacity:1;animation:none;' });
+      msg.innerHTML = '<span class="avatar sb"><img src="site/assets/brand/mark-clean.svg" alt=""/></span>'
+        + '<div class="m-main"><div class="m-head"><span class="m-name">superbot</span><span class="app">APP</span>'
+        + `<span class="m-when">${nowLabel()}</span></div><div class="m-text"></div></div>`;
+      const [lenTag, text] = SHOT_LENGTHS[i % SHOT_LENGTHS.length];
+      msg.querySelector('.m-text').textContent = text;
+      f.append(msg);
+      const label = fontLabelOf(stack);
+      cap.textContent = `${label} · weight ${weight} · ${lenTag}`;
+      // force the exact face at the exact weight to load before rasterizing
+      const first = stack.split(',')[0].replace(/["']/g, '').trim();
+      if (first && !first.startsWith('-apple') && !first.startsWith('ui-')) {
+        try { await document.fonts.load(`${weight} 16px "${first}"`, text); } catch { /* best effort */ }
+      }
+      await document.fonts.ready;
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      btn.textContent = `shooting ${i + 1}/${targets.length}`;
+      const canvas = await window.html2canvas(panel, { scale: 2, backgroundColor: '#0c0c0e', logging: false, useCORS: true });
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `chat-${String(i + 1).padStart(2, '0')}-${slug(label)}-w${weight}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+      await new Promise(r => setTimeout(r, 350));
+    }
+  } finally {
+    cap.remove();
+    Object.assign(settings, orig);
+    applyFont();
+    save();
+    btn.textContent = origText;
+    btn.disabled = false;
+  }
+}
+
 function buildPanel() {
   const slider = (key, label, min, max, step, unit) => {
     const val = h('span', { class: 'tk-val' }, settings[key] + (unit || ''));
@@ -415,6 +496,7 @@ function buildPanel() {
   const fontPills = [];
   const selectFont = (stack, btn) => {
     settings.font = stack;
+    settings.recent = [stack, ...(settings.recent || []).filter(s => s !== stack)].slice(0, 4);
     fontPills.forEach(p => { if (p.classList?.contains('tk-fp')) p.classList.toggle('sel', p === btn); });
     applyFont();
     save();
@@ -482,6 +564,8 @@ function buildPanel() {
         h('button', { class: 'tk-btn primary', 'data-tk': 'chat', onclick: typeLorem }, 'Chat')),
       h('div', { class: 'tk-row' },
         h('button', { class: 'tk-btn', 'data-tk': 'record', onclick: toggleRecording }, 'Record chat')),
+      h('div', { class: 'tk-row' },
+        h('button', { class: 'tk-btn', 'data-tk': 'shotall', onclick: e => screenshotAll(e.currentTarget) }, 'Screenshot All')),
       h('div', { class: 'tk-group' },
         h('span', { class: 'tk-label' }, 'effect'),
         effSel,

@@ -52,6 +52,19 @@
   color: #fff;
 }
 .tk-btn.primary:hover { filter: brightness(1.1); }
+.tk-btn:disabled { opacity: 0.6; cursor: wait; }
+
+/* caption bar burned into screenshot-all shots */
+.tk-cap {
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  background: #0a0a0c;
+  color: #9a9aa2;
+  font: 700 11px/1.3 ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.06em;
+  text-align: center;
+  flex: none;
+}
 .tk-btn.recording {
   background: linear-gradient(135deg, #ff4d4d, #c026d3);
   border-color: transparent;
