@@ -199,9 +199,21 @@ function buildPanel() {
     return h('div', { class: 'tk-cfg' }, h('span', { class: 'tk-label' }, label), input, val);
   };
 
-  const fontSel = h('select', { onchange: () => { settings.font = fontSel.value; applyFont(); save(); } },
-    ...FONTS.map(([name, stack]) => h('option', { value: stack }, name)));
-  fontSel.value = settings.font;
+  // font options as pills, Ask-Superbot style; each label previews its own face
+  const fontPills = FONTS.map(([name, stack]) => {
+    const b = h('button', {
+      class: 'tk-fp' + (settings.font === stack ? ' sel' : ''),
+      style: `font-family:${stack}`,
+      'data-tk': 'font',
+      onclick: () => {
+        settings.font = stack;
+        fontPills.forEach(p => p.classList.toggle('sel', p === b));
+        applyFont();
+        save();
+      },
+    }, name);
+    return b;
+  });
 
   const effSel = h('select', { onchange: () => { settings.effect = effSel.value; applyEffectClass(); save(); } },
     ...EFFECTS.map(([id, name]) => h('option', { value: id }, name)));
@@ -246,7 +258,7 @@ function buildPanel() {
         slider('fadeMs', 'fade time', 60, 1000, 10, 'ms')),
       h('div', { class: 'tk-group' },
         h('span', { class: 'tk-label' }, 'font'),
-        fontSel,
+        h('div', { class: 'tk-fonts', 'data-tk': 'fonts' }, ...fontPills),
         slider('size', 'size', 10, 22, 0.5, 'px'),
         slider('spacing', 'letterspacing', -0.5, 4, 0.1, 'px'),
         slider('lineHeight', 'line height', 1.1, 2, 0.05, ''),

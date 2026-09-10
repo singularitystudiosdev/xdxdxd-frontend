@@ -63,6 +63,37 @@
 .tk-group { display: grid; gap: 6px; }
 .tk-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
 
+.tk-fonts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-height: 128px;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.tk-fp {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6e6ea;
+  font-size: 10.5px;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.tk-fp:hover { background: rgba(255, 255, 255, 0.12); }
+.tk-fp:active { transform: scale(0.96); }
+.tk-fp.sel {
+  background: linear-gradient(135deg, #4f5bf0, #a855f7);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(126, 84, 247, 0.45);
+}
 .tk select, .tk input[type="color"] {
   appearance: none;
   width: 100%;
