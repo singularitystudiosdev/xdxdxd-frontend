@@ -5,8 +5,21 @@
 
 const STORE = 'tk-settings-v1';
 
+// One batched Google Fonts request covers every (web) entry; injected on mount,
+// display=swap so text never blocks. Stock faces below need nothing.
+const WEB_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800'
+  + '&family=Space+Grotesk:wght@400;500;600;700'
+  + '&family=Archivo:wght@400;500;600;700;800'
+  + '&family=Manrope:wght@400;500;600;700;800'
+  + '&family=Oswald:wght@400;500;600;700'
+  + '&family=Barlow+Condensed:wght@400;500;600;700;800'
+  + '&family=Roboto+Condensed:wght@400;500;600;700;800&display=swap';
+
 const FONTS = [
-  ['System UI', '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif'],
+  ['System UI (this OS)', '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif'],
+  ['SF Pro Rounded (Ask Superbot)', '"SF Pro Rounded", "SF Pro Display", -apple-system, system-ui, sans-serif'],
+  ['SF Pro Display', '"SF Pro Display", -apple-system, sans-serif'],
+  ['SF Pro Text', '"SF Pro Text", -apple-system, sans-serif'],
   ['SF Mono (page mono)', 'ui-monospace, "SF Mono", Menlo, monospace'],
   ['Menlo', 'Menlo, "Bitstream Vera Sans Mono", monospace'],
   ['Courier New', '"Courier New", Courier, monospace'],
@@ -25,7 +38,29 @@ const FONTS = [
   ['Baskerville', 'Baskerville, "Baskerville Old Face", serif'],
   ['Didot', 'Didot, "Bodoni MT", serif'],
   ['Chalkboard SE', '"Chalkboard SE", "Comic Sans MS", cursive'],
+  // the tight & bold shelf: macOS stock first, then lazy web faces
+  ['Avenir Next Condensed', '"Avenir Next Condensed", "Avenir Next", sans-serif'],
+  ['Futura Condensed ExtraBold', '"Futura Condensed ExtraBold", Futura, sans-serif'],
+  ['Arial Narrow', '"Arial Narrow", Arial, sans-serif'],
+  ['Arial Black', '"Arial Black", Arial, sans-serif'],
+  ['Inter Tight (web)', '"Inter Tight", -apple-system, sans-serif'],
+  ['Space Grotesk (web)', '"Space Grotesk", -apple-system, sans-serif'],
+  ['Archivo (web)', '"Archivo", -apple-system, sans-serif'],
+  ['Manrope (web)', '"Manrope", -apple-system, sans-serif'],
+  ['Oswald (web)', '"Oswald", -apple-system, sans-serif'],
+  ['Barlow Condensed (web)', '"Barlow Condensed", -apple-system, sans-serif'],
+  ['Roboto Condensed (web)', '"Roboto Condensed", -apple-system, sans-serif'],
 ];
+
+let webFontsLinked = false;
+function linkWebFonts() {
+  if (webFontsLinked) return;
+  webFontsLinked = true;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = WEB_FONTS_URL;
+  document.head.append(link);
+}
 
 const EFFECTS = [
   ['fade', 'Fade (clean typewriter)'],
@@ -274,6 +309,7 @@ function buildPanel() {
 
 function mount() {
   if (!document.querySelector('#feed')) { setTimeout(mount, 300); return; }
+  linkWebFonts();
   document.body.append(buildPanel());
   applyFont();
   applyEffectClass();
