@@ -74,11 +74,19 @@
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  max-height: 128px;
+  max-height: 168px;
   overflow-y: auto;
   padding-right: 2px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.tk-glabel {
+  flex-basis: 100%;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6f6f78;
+  margin: 3px 0 1px;
 }
 .tk-fp {
   appearance: none;

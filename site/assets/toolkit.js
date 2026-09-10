@@ -5,62 +5,194 @@
 
 const STORE = 'tk-settings-v1';
 
-// One batched Google Fonts request covers every (web) entry; injected on mount,
-// display=swap so text never blocks. Stock faces below need nothing.
-const WEB_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600;700;800;900'
-  + '&family=Space+Grotesk:wght@300;400;500;600;700'
-  + '&family=Archivo:wght@100;200;300;400;500;600;700;800;900'
-  + '&family=Manrope:wght@200;300;400;500;600;700;800'
-  + '&family=Oswald:wght@200;300;400;500;600;700'
-  + '&family=Barlow+Condensed:wght@100;200;300;400;500;600;700;800;900'
-  + '&family=Roboto+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap';
+// ---- the font library -----------------------------------------------------
+// system: macOS stock faces (on other OSes a pill falls back to the system
+// face - previews are honest only on a Mac). brands: famous marks mapped to
+// their real face where it is freely available, else the closest free cut.
+// web: the wider Google Fonts shelf. One <link> per family, display=swap -
+// a face downloads only when it is actually rendered, so the long list is
+// cheap until used, and one missing family can never break the others.
 
-const FONTS = [
+const SANS = 'sans-serif';
+const FONTS_SYSTEM = [
   ['System UI (this OS)', '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif'],
   ['SF Pro Rounded (Ask Superbot)', '"SF Pro Rounded", "SF Pro Display", -apple-system, system-ui, sans-serif'],
   ['SF Pro Display', '"SF Pro Display", -apple-system, sans-serif'],
   ['SF Pro Text', '"SF Pro Text", -apple-system, sans-serif'],
   ['superbot.gg wordmark', '"SF Pro Rounded", "SF Pro Display", -apple-system, system-ui, sans-serif'],
+  ['New York (ui-serif)', 'ui-serif, "New York", Georgia, serif'],
   ['SF Mono (page mono)', 'ui-monospace, "SF Mono", Menlo, monospace'],
   ['Menlo', 'Menlo, "Bitstream Vera Sans Mono", monospace'],
-  ['Courier New', '"Courier New", Courier, monospace'],
-  ['American Typewriter', '"American Typewriter", "Courier New", monospace'],
+  ['Helvetica', 'Helvetica, "Helvetica Neue", Arial, sans-serif'],
   ['Helvetica Neue', '"Helvetica Neue", Helvetica, Arial, sans-serif'],
   ['Arial', 'Arial, Helvetica, sans-serif'],
+  ['Arial Black', '"Arial Black", Arial, sans-serif'],
+  ['Arial Narrow', '"Arial Narrow", Arial, sans-serif'],
+  ['Avenir', 'Avenir, "Avenir Next", sans-serif'],
   ['Avenir Next', '"Avenir Next", Avenir, sans-serif'],
+  ['Avenir Next Condensed', '"Avenir Next Condensed", "Avenir Next", sans-serif'],
   ['Futura', 'Futura, "Century Gothic", sans-serif'],
+  ['Futura Condensed ExtraBold', '"Futura Condensed ExtraBold", Futura, sans-serif'],
   ['Gill Sans', '"Gill Sans", "Gill Sans MT", sans-serif'],
   ['Optima', 'Optima, Candara, sans-serif'],
   ['Verdana', 'Verdana, Geneva, sans-serif'],
   ['Trebuchet MS', '"Trebuchet MS", Tahoma, sans-serif'],
+  ['Impact', 'Impact, "Arial Black", sans-serif'],
   ['Georgia', 'Georgia, "Times New Roman", serif'],
   ['Times New Roman', '"Times New Roman", Times, serif'],
   ['Palatino', 'Palatino, "Palatino Linotype", "Book Antiqua", serif'],
   ['Baskerville', 'Baskerville, "Baskerville Old Face", serif'],
+  ['Big Caslon', '"Big Caslon", "Baskerville Old Face", serif'],
+  ['Bodoni 72', '"Bodoni 72", Didot, serif'],
   ['Didot', 'Didot, "Bodoni MT", serif'],
+  ['Hoefler Text', '"Hoefler Text", Georgia, serif'],
+  ['Rockwell', 'Rockwell, "Courier Bold", serif'],
+  ['Superclarendon', '"Superclarendon", "Clarendon", Georgia, serif'],
+  ['Charter', 'Charter, "Bitstream Charter", Georgia, serif'],
+  ['Kefa', 'Kefa, Georgia, serif'],
+  ['Galvji', 'Galvji, "Avenir Next", sans-serif'],
+  ['Skia', 'Skia, "Avenir Next", sans-serif'],
+  ['DIN Alternate', '"DIN Alternate", Futura, sans-serif'],
+  ['DIN Condensed', '"DIN Condensed", "DIN Alternate", sans-serif'],
+  ['Copperplate', 'Copperplate, "Copperplate Gothic Bold", sans-serif'],
+  ['American Typewriter', '"American Typewriter", "Courier New", monospace'],
+  ['Andale Mono', '"Andale Mono", "Courier New", monospace'],
   ['Chalkboard SE', '"Chalkboard SE", "Comic Sans MS", cursive'],
-  // the tight & bold shelf: macOS stock first, then lazy web faces
-  ['Avenir Next Condensed', '"Avenir Next Condensed", "Avenir Next", sans-serif'],
-  ['Futura Condensed ExtraBold', '"Futura Condensed ExtraBold", Futura, sans-serif'],
-  ['Arial Narrow', '"Arial Narrow", Arial, sans-serif'],
-  ['Arial Black', '"Arial Black", Arial, sans-serif'],
-  ['Inter Tight (web)', '"Inter Tight", -apple-system, sans-serif'],
-  ['Space Grotesk (web)', '"Space Grotesk", -apple-system, sans-serif'],
-  ['Archivo (web)', '"Archivo", -apple-system, sans-serif'],
-  ['Manrope (web)', '"Manrope", -apple-system, sans-serif'],
-  ['Oswald (web)', '"Oswald", -apple-system, sans-serif'],
-  ['Barlow Condensed (web)', '"Barlow Condensed", -apple-system, sans-serif'],
-  ['Roboto Condensed (web)', '"Roboto Condensed", -apple-system, sans-serif'],
+  ['Chalkduster', 'Chalkduster, "Chalkboard SE", cursive'],
+  ['Marker Felt', '"Marker Felt", "Comic Sans MS", cursive'],
+  ['Noteworthy', 'Noteworthy, "Marker Felt", cursive'],
+  ['Bradley Hand', '"Bradley Hand", "Comic Sans MS", cursive'],
+  ['Brush Script MT', '"Brush Script MT", cursive'],
+  ['Trattatello', 'Trattatello, "Marker Felt", cursive'],
+  ['Papyrus', 'Papyrus, fantasy'],
+  ['Luminari', 'Luminari, fantasy'],
+  ['Apple Chancery', '"Apple Chancery", cursive'],
+  ['Snell Roundhand', '"Snell Roundhand", cursive'],
+  ['Savoye LET', '"Savoye LET", cursive'],
+  ['SignPainter', 'SignPainter, "Snell Roundhand", cursive'],
+  ['Grand Hotel', '"Grand Hotel", cursive'],
+  ['Party LET', '"Party LET", cursive'],
+  ['Zapfino', 'Zapfino, cursive'],
+];
+
+const FONTS_BRANDS = [
+  ['Netflix · Bebas Neue', '"Bebas Neue", Impact, sans-serif'],
+  ['Vercel · Geist', '"Geist", -apple-system, sans-serif'],
+  ['IBM · Plex Sans', '"IBM Plex Sans", Helvetica, sans-serif'],
+  ['YouTube · Roboto', 'Roboto, Arial, sans-serif'],
+  ['Stripe · Inter', 'Inter, -apple-system, sans-serif'],
+  ['Tesla · Montserrat', 'Montserrat, Futura, sans-serif'],
+  ['Spotify · DM Sans', '"DM Sans", Circular, sans-serif'],
+  ['Meta · Figtree', 'Figtree, -apple-system, sans-serif'],
+  ['Uber · Archivo', 'Archivo, -apple-system, sans-serif'],
+  ['Amazon · Open Sans', '"Open Sans", Arial, sans-serif'],
+  ['Airbnb · Nunito Sans', '"Nunito Sans", -apple-system, sans-serif'],
+  ['NYT masthead · UnifrakturCook', '"UnifrakturCook", serif'],
+  ['Disney · Pacifico', 'Pacifico, cursive'],
+];
+
+const FONTS_WEB = [
+  ['Inter Tight', '"Inter Tight", -apple-system, sans-serif'],
+  ['Manrope', 'Manrope, -apple-system, sans-serif'],
+  ['Space Grotesk', '"Space Grotesk", -apple-system, sans-serif'],
+  ['Outfit', 'Outfit, -apple-system, sans-serif'],
+  ['Urbanist', 'Urbanist, -apple-system, sans-serif'],
+  ['Plus Jakarta Sans', '"Plus Jakarta Sans", -apple-system, sans-serif'],
+  ['Lexend', 'Lexend, -apple-system, sans-serif'],
+  ['Sora', 'Sora, -apple-system, sans-serif'],
+  ['Work Sans', '"Work Sans", -apple-system, sans-serif'],
+  ['Rubik', 'Rubik, -apple-system, sans-serif'],
+  ['Raleway', 'Raleway, -apple-system, sans-serif'],
+  ['Public Sans', '"Public Sans", -apple-system, sans-serif'],
+  ['Source Sans 3', '"Source Sans 3", -apple-system, sans-serif'],
+  ['Fira Sans', '"Fira Sans", -apple-system, sans-serif'],
+  ['Oswald', 'Oswald, Impact, sans-serif'],
+  ['Barlow Condensed', '"Barlow Condensed", -apple-system, sans-serif'],
+  ['Roboto Condensed', '"Roboto Condensed", -apple-system, sans-serif'],
+  ['JetBrains Mono', '"JetBrains Mono", Menlo, monospace'],
+  ['IBM Plex Mono', '"IBM Plex Mono", Menlo, monospace'],
+  ['Fira Code', '"Fira Code", Menlo, monospace'],
+  ['Space Mono', '"Space Mono", Menlo, monospace'],
+  ['Roboto Mono', '"Roboto Mono", Menlo, monospace'],
+  ['Playfair Display', '"Playfair Display", Georgia, serif'],
+  ['Merriweather', 'Merriweather, Georgia, serif'],
+  ['EB Garamond', '"EB Garamond", Georgia, serif'],
+  ['Fraunces', 'Fraunces, Georgia, serif'],
+  ['Spectral', 'Spectral, Georgia, serif'],
+  ['Instrument Serif', '"Instrument Serif", Georgia, serif'],
+  ['Anton', 'Anton, Impact, sans-serif'],
+  ['Archivo Black', '"Archivo Black", Impact, sans-serif'],
+  ['Lobster', 'Lobster, cursive'],
+  ['Dancing Script', '"Dancing Script", cursive'],
+  ['Josefin Sans', '"Josefin Sans", sans-serif'],
+  ['Quicksand', 'Quicksand, sans-serif'],
+  ['Comfortaa', 'Comfortaa, sans-serif'],
+];
+
+// [Google Fonts family, css2 weight list] - discrete lists only, so a family
+// serves exactly the weights it publishes.
+const WEB_FAMILIES = [
+  ['Inter Tight', '100;200;300;400;500;600;700;800;900'],
+  ['Inter', '100;200;300;400;500;600;700;800;900'],
+  ['Manrope', '200;300;400;500;600;700;800'],
+  ['Space Grotesk', '300;400;500;600;700'],
+  ['Outfit', '100;200;300;400;500;600;700;800;900'],
+  ['Urbanist', '100;200;300;400;500;600;700;800;900'],
+  ['Plus Jakarta Sans', '200;300;400;500;600;700;800'],
+  ['Lexend', '100;200;300;400;500;600;700;800;900'],
+  ['Sora', '100;200;300;400;500;600;700;800'],
+  ['Work Sans', '100;200;300;400;500;600;700;800;900'],
+  ['Rubik', '300;400;500;600;700;800;900'],
+  ['Raleway', '100;200;300;400;500;600;700;800;900'],
+  ['Public Sans', '100;200;300;400;500;600;700;800;900'],
+  ['Source Sans 3', '200;300;400;500;600;700;800;900'],
+  ['Fira Sans', '100;200;300;400;500;600;700;800;900'],
+  ['Oswald', '200;300;400;500;600;700'],
+  ['Barlow Condensed', '100;200;300;400;500;600;700;800;900'],
+  ['Roboto', '100;200;300;400;500;600;700;800;900'],
+  ['Roboto Condensed', '100;200;300;400;500;600;700;800;900'],
+  ['Roboto Mono', '100;200;300;400;500;600;700'],
+  ['JetBrains Mono', '100;200;300;400;500;600;700;800'],
+  ['IBM Plex Mono', '100;200;300;400;500;600;700'],
+  ['Fira Code', '300;400;500;600;700'],
+  ['Space Mono', '400;700'],
+  ['Playfair Display', '400;500;600;700;800;900'],
+  ['Merriweather', '300;400;500;600;700;800;900'],
+  ['EB Garamond', '400;500;600;700;800'],
+  ['Fraunces', '100;200;300;400;500;600;700;800;900'],
+  ['Spectral', '200;300;400;500;600;700;800'],
+  ['Instrument Serif', '400'],
+  ['Bebas Neue', '400'],
+  ['Anton', '400'],
+  ['Archivo Black', '400'],
+  ['Archivo', '100;200;300;400;500;600;700;800;900'],
+  ['Montserrat', '100;200;300;400;500;600;700;800;900'],
+  ['DM Sans', '100;200;300;400;500;600;700;800;900;1000'],
+  ['Figtree', '300;400;500;600;700;800;900'],
+  ['Open Sans', '300;400;500;600;700;800'],
+  ['Nunito Sans', '200;300;400;500;600;700;800;900;1000'],
+  ['IBM Plex Sans', '100;200;300;400;500;600;700'],
+  ['Geist', '100;200;300;400;500;600;700;800;900'],
+  ['Pacifico', '400'],
+  ['UnifrakturCook', '700'],
+];
+
+const FONT_GROUPS = [
+  ['system · this mac', FONTS_SYSTEM],
+  ['brands', FONTS_BRANDS],
+  ['web · google fonts', FONTS_WEB],
 ];
 
 let webFontsLinked = false;
 function linkWebFonts() {
   if (webFontsLinked) return;
   webFontsLinked = true;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = WEB_FONTS_URL;
-  document.head.append(link);
+  for (const [family, wghts] of WEB_FAMILIES) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, '+')}:wght@${wghts}&display=swap`;
+    document.head.append(link);
+  }
 }
 
 const EFFECTS = [
@@ -279,21 +411,25 @@ function buildPanel() {
     return h('div', { class: 'tk-cfg' }, h('span', { class: 'tk-label' }, label), input, val);
   };
 
-  // font options as pills, Ask-Superbot style; each label previews its own face
-  const fontPills = FONTS.map(([name, stack]) => {
-    const b = h('button', {
-      class: 'tk-fp' + (settings.font === stack ? ' sel' : ''),
-      style: `font-family:${stack}`,
-      'data-tk': 'font',
-      onclick: () => {
-        settings.font = stack;
-        fontPills.forEach(p => p.classList.toggle('sel', p === b));
-        applyFont();
-        save();
-      },
-    }, name);
-    return b;
-  });
+  // font options as pills across the three shelves; each label previews its own face
+  const fontPills = [];
+  const selectFont = (stack, btn) => {
+    settings.font = stack;
+    fontPills.forEach(p => { if (p.classList?.contains('tk-fp')) p.classList.toggle('sel', p === btn); });
+    applyFont();
+    save();
+  };
+  for (const [label, fonts] of FONT_GROUPS) {
+    fontPills.push(h('span', { class: 'tk-glabel' }, label));
+    for (const [name, stack] of fonts) {
+      fontPills.push(h('button', {
+        class: 'tk-fp' + (settings.font === stack ? ' sel' : ''),
+        style: `font-family:${stack}`,
+        'data-tk': 'font',
+        onclick: e => selectFont(stack, e.currentTarget),
+      }, name));
+    }
+  }
 
   const effSel = h('select', { onchange: () => { settings.effect = effSel.value; applyEffectClass(); save(); } },
     ...EFFECTS.map(([id, name]) => h('option', { value: id }, name)));
