@@ -214,6 +214,58 @@ function clearChat() {
   f.querySelectorAll('.msg, .date-div').forEach(e => e.remove());
 }
 
+// --- recording: region-capture the chat column, save a clean-named file ---
+let recording = null; // { rec, btn }
+
+function stopRecording() {
+  if (!recording) return;
+  recording.rec.stop();
+  recording.btn.textContent = 'Record chat';
+  recording.btn.classList.remove('recording');
+  recording = null;
+}
+
+async function startRecording(btn) {
+  const target = document.querySelector('.main.inner');
+  if (!navigator.mediaDevices?.getDisplayMedia) { btn.textContent = 'no capture support'; setTimeout(() => { btn.textContent = 'Record chat'; }, 2000); return; }
+  const stream = await navigator.mediaDevices.getDisplayMedia({
+    video: { frameRate: 30 }, audio: false,
+    preferCurrentTab: true, selfBrowserSurface: 'include', systemAudio: 'exclude',
+  });
+  const track = stream.getVideoTracks()[0];
+  // Region Capture (Chrome 116+): crop the shared tab to exactly the chat panel
+  if (target && 'CropTarget' in window) {
+    try { await track.cropTo(await CropTarget.fromElement(target)); } catch { /* fall back to full-tab */ }
+  }
+  const mimes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'];
+  const mime = mimes.find(m => MediaRecorder.isTypeSupported(m)) || '';
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
+  const chunks = [];
+  rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  rec.onstop = () => {
+    stream.getTracks().forEach(t => t.stop());
+    const blob = new Blob(chunks, { type: mime || 'video/webm' });
+    const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+    const stamp = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 19);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `superbot-chat-${stamp}.${ext}`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+  };
+  track.addEventListener('ended', stopRecording);
+  rec.start(250);
+  recording = { rec, btn };
+  btn.textContent = 'Stop recording';
+  btn.classList.add('recording');
+}
+
+function toggleRecording(e) {
+  const btn = e.currentTarget;
+  if (recording) stopRecording();
+  else startRecording(btn).catch(() => { btn.textContent = 'Record chat'; btn.classList.remove('recording'); });
+}
+
 function buildPanel() {
   const slider = (key, label, min, max, step, unit) => {
     const val = h('span', { class: 'tk-val' }, settings[key] + (unit || ''));
@@ -292,6 +344,8 @@ function buildPanel() {
       h('div', { class: 'tk-row' },
         h('button', { class: 'tk-btn danger', 'data-tk': 'clear', onclick: clearChat }, 'Clear chat'),
         h('button', { class: 'tk-btn primary', 'data-tk': 'chat', onclick: typeLorem }, 'Chat')),
+      h('div', { class: 'tk-row' },
+        h('button', { class: 'tk-btn', 'data-tk': 'record', onclick: toggleRecording }, 'Record chat')),
       h('div', { class: 'tk-group' },
         h('span', { class: 'tk-label' }, 'effect'),
         effSel,
