@@ -416,9 +416,68 @@ function fontLabelOf(stack) {
 
 function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
 
+// minimal store-only ZIP (PNGs are already compressed) so all shots arrive as
+// ONE download - Chrome blocks multiple programmatic downloads per gesture.
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+
+function crc32(bytes) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+function makeZip(files) { // files: [{ name, data: Uint8Array }]
+  const enc = new TextEncoder();
+  const chunks = [], central = [];
+  let offset = 0;
+  for (const { name, data } of files) {
+    const nameBytes = enc.encode(name), crc = crc32(data);
+    const local = new Uint8Array(30 + nameBytes.length);
+    const lv = new DataView(local.buffer);
+    lv.setUint32(0, 0x04034b50, true); lv.setUint16(4, 20, true);
+    lv.setUint16(8, 0, true); lv.setUint32(14, crc, true);
+    lv.setUint32(18, data.length, true); lv.setUint32(22, data.length, true);
+    lv.setUint16(26, nameBytes.length, true);
+    local.set(nameBytes, 30);
+    chunks.push(local, data);
+    central.push({ nameBytes, crc, size: data.length, offset });
+    offset += local.length + data.length;
+  }
+  const cdStart = offset;
+  for (const { nameBytes, crc, size, offset: o } of central) {
+    const cd = new Uint8Array(46 + nameBytes.length);
+    const cv = new DataView(cd.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true);
+    cv.setUint32(16, crc, true); cv.setUint32(20, size, true); cv.setUint32(24, size, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint32(42, o, true);
+    cd.set(nameBytes, 46);
+    chunks.push(cd);
+    offset += cd.length;
+  }
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(8, files.length, true); ev.setUint16(10, files.length, true);
+  ev.setUint32(12, offset - cdStart, true); ev.setUint32(16, cdStart, true);
+  chunks.push(eocd);
+  const out = new Uint8Array(offset + 22);
+  let pos = 0;
+  for (const c of chunks) { out.set(c, pos); pos += c.length; }
+  return out;
+}
+
 async function screenshotAll(btn) {
   const targets = ((settings.recent || []).length ? settings.recent : [settings.font]).slice(0, 4);
-  const orig = { font: settings.font, weight: settings.weight, bold: settings.bold };
+  const orig = { font: settings.font, weight: settings.weight, bold: settings.bold, spacing: settings.spacing };
   const origText = btn.textContent;
   btn.disabled = true;
   if (!window.html2canvas) {
@@ -435,6 +494,10 @@ async function screenshotAll(btn) {
   const cap = h('div', { class: 'tk-cap' });
   panel.append(cap);
   const weight = orig.bold ? 700 : orig.weight;
+  // html2canvas mis-measures text with non-zero letter-spacing; shots are
+  // taken at 0 and the operator's spacing is restored after.
+  settings.spacing = 0;
+  const shots = [];
   try {
     for (let i = 0; i < targets.length; i++) {
       const stack = targets[i];
@@ -447,6 +510,7 @@ async function screenshotAll(btn) {
       msg.innerHTML = '<span class="avatar sb"><img src="site/assets/brand/mark-clean.svg" alt=""/></span>'
         + '<div class="m-main"><div class="m-head"><span class="m-name">superbot</span><span class="app">APP</span>'
         + `<span class="m-when">${nowLabel()}</span></div><div class="m-text"></div></div>`;
+      msg.querySelector('.app').style.cssText = 'background:#2f6bff;color:#fff;font-weight:700;border-radius:5px;padding:1px 5px;font-size:9px;';
       const [lenTag, text] = SHOT_LENGTHS[i % SHOT_LENGTHS.length];
       msg.querySelector('.m-text').textContent = text;
       f.append(msg);
@@ -462,13 +526,17 @@ async function screenshotAll(btn) {
       btn.textContent = `shooting ${i + 1}/${targets.length}`;
       const canvas = await window.html2canvas(panel, { scale: 2, backgroundColor: '#0c0c0e', logging: false, useCORS: true });
       const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `chat-${String(i + 1).padStart(2, '0')}-${slug(label)}-w${weight}.png`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
-      await new Promise(r => setTimeout(r, 350));
+      shots.push({
+        name: `chat-${String(i + 1).padStart(2, '0')}-${slug(label)}-w${weight}.png`,
+        data: new Uint8Array(await blob.arrayBuffer()),
+      });
     }
+    const zipBlob = new Blob([makeZip(shots)], { type: 'application/zip' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = `chat-shots-${new Date().toISOString().replace(/[:T]/g, '-').slice(0, 19)}.zip`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
   } finally {
     cap.remove();
     Object.assign(settings, orig);
